@@ -110,7 +110,6 @@ package net.natpat
 		
 		public function render(buffer:BitmapData):void
 		{
-			trace(x, y);
 			GV.screen.draw(route.lineGraphic);
 			ss.render(x - 40, y - 65);
 		}

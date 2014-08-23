@@ -18,6 +18,8 @@ package net.natpat
 		
 		public static var currentRoute:Vector.<WaypointConnection> = new Vector.<WaypointConnection>();
 		
+		public static var zoom:Number = 5;
+		
 		/**
 		 * Reference to the stage
 		 */

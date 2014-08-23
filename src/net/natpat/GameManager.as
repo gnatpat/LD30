@@ -3,6 +3,7 @@ package net.natpat {
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.Shape;
+	import flash.geom.Matrix;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import net.natpat.gui.Button;
@@ -30,7 +31,9 @@ package net.natpat {
 		public var bitmap:Bitmap;
 		public static var renderer:BitmapData;
 		
+		public var map:Map;
 		public var mapBD:BitmapData;
+		public var scaleBD:BitmapData;
 		
 		public var wm:WaypointManager;
 		
@@ -41,7 +44,7 @@ package net.natpat {
 		
 		public var curvePoint:Point;
 		
-		public var ship:Ship;
+		public var sm:ShipManager;
 		
 		public function GameManager(stageWidth:int, stageHeight:int) 
 		{
@@ -53,29 +56,32 @@ package net.natpat {
 			
 			bitmap = new Bitmap(renderer);
 			
-			mapBD = new BitmapData(10 * 400, 6 * 400, true, 0);
+			map = new Map();
+			
+			mapBD = new BitmapData(GC.SCREEN_WIDTH * 5, GC.SCREEN_HEIGHT * 5, true, 0);
 			
 			GV.screen = renderer;
 			
 			wm = new WaypointManager(renderer);
 			
-			for(var i:int = 0; i < 70; i++)
-			{
-				wm.add(new Waypoint(GV.rand(GC.SCREEN_WIDTH), GV.rand(GC.SCREEN_HEIGHT)));
-			}
+			wm.add(new Port(7965, 1650, "Bristol"));
+			wm.add(new Port(7710, 1590, "Dublin"));
 			
-			for(var i:int = 0; i < 10; i++)
-			{
-				wm.add(new Port(GV.rand(GC.SCREEN_WIDTH), GV.rand(GC.SCREEN_HEIGHT), "Port"));
-			}
 			
 			wm.connectWaypoints();
+			
+			sm = new ShipManager(renderer);
 			
 			pathGraphic = new Shape();
 			pathGraphic.graphics.lineStyle(1, 0, 1);
 			
 			mouseLine = new Shape();
 			mouseLine.graphics.lineStyle(1, 0, 1);
+			
+			GV.camera.x = 8000;
+			GV.camera.y = 1750;
+			
+			GV.zoom = 2.3;
 			
 		}
 		
@@ -86,15 +92,21 @@ package net.natpat {
 			//Render the background
 			renderer.fillRect(new Rectangle(0, 0, renderer.width, renderer.height), 0x68c8ff);
 			
+			map.render(mapBD);
+			
+			var m:Matrix = new Matrix();
+			m.scale(1 / GV.zoom, 1 / GV.zoom);
+			
+			renderer.draw(mapBD, m);
+			
+			//renderer.copyPixels(mapBD, mapBD.rect, GC.ZERO);
+			
 			wm.render();
 			
 			renderer.draw(pathGraphic);
 			renderer.draw(mouseLine);
 			
-			if (ship != null)
-			{
-				ship.render(GV.screen);
-			}
+			sm.render();
 			
 			GuiManager.render();
 			
@@ -138,16 +150,51 @@ package net.natpat {
 			{
 				if (GV.currentRoute.length != 0)
 				{
-					ship = new Ship(new Route(GV.currentRoute, pathGraphic));
+					drawLine(GV.currentRoute[oldLength]);
+					var s:Ship = new Ship(new Route(GV.currentRoute, pathGraphic));
+					sm.addShip(s);
 					pathGraphic = new Shape();
 					GV.currentRoute = new Vector.<WaypointConnection>();
 				}
+				mouseLine.graphics.clear();
 			}
 			
-			if (ship != null)
+			sm.update();
+			
+			if (Input.keyDown(Key.LEFT))
 			{
-				ship.update();
+				GV.camera.x -= GC.CAMERA_SCROLL * GV.zoom * GV.elapsed;
 			}
+			
+			if (Input.keyDown(Key.RIGHT))
+			{
+				GV.camera.x += GC.CAMERA_SCROLL * GV.zoom * GV.elapsed;
+			}
+			
+			if (Input.keyDown(Key.UP))
+			{
+				GV.camera.y -= GC.CAMERA_SCROLL * GV.zoom * GV.elapsed;
+			}
+			
+			if (Input.keyDown(Key.DOWN))
+			{
+				GV.camera.y += GC.CAMERA_SCROLL * GV.zoom * GV.elapsed;
+			}
+			
+			if (Input.keyDown(Key.Q))
+			{
+				GV.zoom -= 1 * GV.elapsed;
+				GV.zoom = Math.max(1, GV.zoom);
+			}
+			
+			if (Input.keyDown(Key.A))
+			{
+				GV.zoom += 1 * GV.elapsed;
+				GV.zoom = Math.min(5, GV.zoom);
+			}
+			
+			trace(GV.camera.x + (-GC.SCREEN_WIDTH / 2 + Input.mouseX) * GV.zoom, 
+				  GV.camera.y + (-GC.SCREEN_HEIGHT/ 2 + Input.mouseY) * GV.zoom)
 			
 			Input.update();
 		}

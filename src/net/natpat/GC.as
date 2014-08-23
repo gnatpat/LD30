@@ -16,6 +16,9 @@ package net.natpat
 		
 		public static const MAX_CONNECTION_LENGTH:int = 100;
 		
+		public static const CAMERA_SCROLL:Number = 300;
+		
+		public static const SPRITE_ZOOM_RATIO:Number = 0.75
 	}
 
 }

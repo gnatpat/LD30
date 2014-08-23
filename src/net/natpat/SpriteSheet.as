@@ -4,6 +4,7 @@ package net.natpat
 	import flash.display.BitmapData;
 	import flash.filters.BitmapFilter;
 	import flash.filters.GlowFilter;
+	import flash.geom.Matrix;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	/**
@@ -114,43 +115,60 @@ package net.natpat
 		}
 		
 		
-		public function render(x:int, y:int):void
+		public function render(x:int, y:int, zoom:Boolean = true, zoomRatio:Number = GC.SPRITE_ZOOM_RATIO):void
 		{
 			if (anim == null) return;
 			
 			if (anim.frames.length == 0) return;
 			
+			var m:Matrix = new Matrix();
+			
+			var renderbd:BitmapData;
+			var r:Rectangle = new Rectangle();
+			
+			fd = anim.frames[frame];
+			point.x = x;
+			point.y = y;
 			if (anim is GlowAnim)
 			{
-				fd = anim.frames[frame];
 			
-				point.x = x;
-				point.y = y;
 				
 				point = point.add(GlowAnim(anim).offset);
 				
-				rect.x = fd.x * GlowAnim(anim).newW;
-				rect.y = fd.y * GlowAnim(anim).newH;
+				r.x = fd.x * GlowAnim(anim).newW;
+				r.y = fd.y * GlowAnim(anim).newH;
 				
-				rect.width = GlowAnim(anim).newW;
-				rect.height = GlowAnim(anim).newH;
-				
-				buffer.copyPixels(GlowAnim(anim).bd, rect, point, null, null, true);
-				
-				rect.width = width;
-				rect.height = height;
-				return;
+				r.width = GlowAnim(anim).newW;
+				r.height = GlowAnim(anim).newH;
+			}
+			else
+			{
+				r.x = fd.x * width  - width + offset.x;
+				r.y = fd.y * height - height + offset.y;
+				r.width = width;
+				r.height = height;
 			}
 			
-			fd = anim.frames[frame];
-			
-			point.x = x;
-			point.y = y;
-			
-			rect.x = fd.x * width  - width + offset.x;
-			rect.y = fd.y * height - height + offset.y;
-			
-			buffer.copyPixels(bitmapData, rect, point, null, null, true);
+			/*if (zoom)
+			{
+				var scale:Number = 1 / GV.zoom;
+				m.translate(-r.x - r.width / 2, -r.y - r.height / 2);
+				m.scale(scale, scale);
+				m.translate(r.x + r.width / 2, r.y + r.height / 2);
+				m.translate(point.x, point.y);
+				m.translate(-GV.camera.x, -GV.camera.y);
+				r.x += point.x - GV.camera.x;
+				r.y += point.y - GV.camera.y;
+				buffer.draw(bitmapData, m, null, null, rect);
+			}
+			else*/
+			{
+				point.x -= GV.camera.x - (GC.SCREEN_WIDTH / 2 * GV.zoom);
+				point.y -= GV.camera.y - (GC.SCREEN_HEIGHT / 2 * GV.zoom);
+				point.x *= 1 /  GV.zoom;
+				point.y *= 1 / GV.zoom;
+				buffer.copyPixels(bitmapData, r, point, null, null, true);
+			}
 		}
 		
 		public function setWidth(width:int):void
