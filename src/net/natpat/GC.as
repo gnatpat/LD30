@@ -18,7 +18,7 @@ package net.natpat
 		
 		public static const CAMERA_SCROLL:Number = 300;
 		
-		public static const SPRITE_ZOOM_RATIO:Number = 0.75
+		public static const SPRITE_ZOOM_RATIO:Number = 0.5
 	}
 
 }

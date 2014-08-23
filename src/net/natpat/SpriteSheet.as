@@ -131,8 +131,6 @@ package net.natpat
 			point.y = y;
 			if (anim is GlowAnim)
 			{
-			
-				
 				point = point.add(GlowAnim(anim).offset);
 				
 				r.x = fd.x * GlowAnim(anim).newW;
@@ -149,24 +147,31 @@ package net.natpat
 				r.height = height;
 			}
 			
-			/*if (zoom)
+			point.x -= GV.camera.x - (GC.SCREEN_WIDTH / 2 * GV.zoom);
+			point.y -= GV.camera.y - (GC.SCREEN_HEIGHT / 2 * GV.zoom);
+			point.x *= 1 /  GV.zoom;
+			point.y *= 1 / GV.zoom;
+			
+			if (zoom)
 			{
-				var scale:Number = 1 / GV.zoom;
-				m.translate(-r.x - r.width / 2, -r.y - r.height / 2);
+				var scale:Number = 1 / (zoomRatio * (GV.zoom - 1) + 1);
+				
+				m.translate( -r.x - r.width / 2, -r.y - r.height / 2);
 				m.scale(scale, scale);
-				m.translate(r.x + r.width / 2, r.y + r.height / 2);
+				m.translate(r.width / 2 * scale, r.height / 2 * scale);
+				
 				m.translate(point.x, point.y);
-				m.translate(-GV.camera.x, -GV.camera.y);
-				r.x += point.x - GV.camera.x;
-				r.y += point.y - GV.camera.y;
-				buffer.draw(bitmapData, m, null, null, rect);
+				
+				r.x = point.x;
+				r.y = point.y
+				
+				r.width *= scale;
+				r.height *= scale;
+				
+				buffer.draw(bitmapData, m, null, null, r);
 			}
-			else*/
+			else
 			{
-				point.x -= GV.camera.x - (GC.SCREEN_WIDTH / 2 * GV.zoom);
-				point.y -= GV.camera.y - (GC.SCREEN_HEIGHT / 2 * GV.zoom);
-				point.x *= 1 /  GV.zoom;
-				point.y *= 1 / GV.zoom;
 				buffer.copyPixels(bitmapData, r, point, null, null, true);
 			}
 		}
