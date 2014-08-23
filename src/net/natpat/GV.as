@@ -5,6 +5,7 @@ package net.natpat
 	import flash.geom.Point;
 	import flash.display.BitmapData;
 	import flash.display.Bitmap;
+	import net.natpat.utils.WaypointConnection;
 	
 	/**
 	 * ...
@@ -12,6 +13,10 @@ package net.natpat
 	 */
 	public class GV 
 	{
+		
+		public static var makingPath:Boolean = false;
+		
+		public static var currentPath:Vector.<WaypointConnection> = new Vector.<WaypointConnection>();
 		
 		/**
 		 * Reference to the stage

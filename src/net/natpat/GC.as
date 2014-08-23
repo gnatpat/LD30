@@ -14,6 +14,8 @@ package net.natpat
 	
 		public static const ZERO:Point = new Point(0, 0);
 		
+		public static const MAX_CONNECTION_LENGTH:int = 100;
+		
 	}
 
 }
