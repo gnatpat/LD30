@@ -2,6 +2,8 @@ package net.natpat
 {
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
+	import flash.filters.BitmapFilter;
+	import flash.filters.GlowFilter;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	/**
@@ -10,32 +12,31 @@ package net.natpat
 	 */
 	public class SpriteSheet 
 	{
-		private var width:int;
-		private var height:int;
-		private var offset:Point;
+		protected var width:int;
+		protected var height:int;
+		protected var offset:Point;
 		
-		private var anims:Object;
+		protected var anims:Object;
 		
-		private var anim:Animation;
-		private var frame:int;
-		private var fd:FrameData;
-		private var time:Number;
+		protected var anim:Animation;
+		protected var frame:int;
+		protected var fd:FrameData;
+		protected var time:Number;
 		
-		private var defaultAnim:Animation;
+		protected var defaultAnim:Animation;
 		
-		private var point:Point;
-		private var rect:Rectangle;
+		protected var point:Point;
+		protected var rect:Rectangle;
 		
-		private var buffer:BitmapData;
+		protected var buffer:BitmapData;
 		
-		private var bitmap:Bitmap;
-		private var bitmapData:BitmapData;
+		protected var bitmapData:BitmapData;
 		
-		public function SpriteSheet(bitmap:Bitmap, width:int, height:int)
+		public function SpriteSheet(source:*, width:int, height:int)
 		{
 			this.width = width;
 			this.height = height; 
-			offset = new Point;
+			offset = new Point(0, 0);
 			
 			anims = new Object();
 			point = new Point();
@@ -49,8 +50,11 @@ package net.natpat
 			
 			buffer = GV.screen;
 			
-			this.bitmap = bitmap;
-			bitmapData = bitmap.bitmapData;
+			bitmapData = GV.loadBitmapDataFromSource(source);
+			
+			addAnim("default", [[0, 0, 5]], true);
+			setDefault("default");
+			changeAnim("default");
 		}
 		
 		/**
@@ -83,6 +87,8 @@ package net.natpat
 		{
 			if (anim == null) return;
 			
+			if (anim.frames.length == 0) return;
+			
 			fd = anim.frames[frame];
 			
 			time += GV.elapsed;
@@ -110,15 +116,51 @@ package net.natpat
 		{
 			if (anim == null) return;
 			
+			if (anim.frames.length == 0) return;
+			
+			if (anim is GlowAnim)
+			{
+				fd = anim.frames[frame];
+			
+				point.x = x;
+				point.y = y;
+				
+				point = point.add(GlowAnim(anim).offset);
+				
+				rect.x = fd.x * GlowAnim(anim).newW;
+				rect.y = fd.y * GlowAnim(anim).newH;
+				
+				rect.width = GlowAnim(anim).newW;
+				rect.height = GlowAnim(anim).newH;
+				
+				buffer.copyPixels(GlowAnim(anim).bd, rect, point, null, null, true);
+				
+				rect.width = width;
+				rect.height = height;
+				return;
+			}
+			
 			fd = anim.frames[frame];
 			
 			point.x = x;
 			point.y = y;
 			
-			rect.x = fd.x * width  + offset.x;
-			rect.y = fd.y * height + offset.y;
+			rect.x = fd.x * width  - width + offset.x;
+			rect.y = fd.y * height - height + offset.y;
 			
 			buffer.copyPixels(bitmapData, rect, point, null, null, true);
+		}
+		
+		public function setWidth(width:int):void
+		{
+			this.width = width;
+			rect.width = width;
+		}
+		
+		public function setHeight(height:int):void
+		{
+			this.height = height;
+			rect.height = height;
 		}
 		
 		public function changeAnim(name:String):void
@@ -133,7 +175,7 @@ package net.natpat
 			changeAnimByObject(defaultAnim);
 		}
 		
-		private function changeAnimByObject(newAnim:Animation):void
+		protected function changeAnimByObject(newAnim:Animation):void
 		{
 			frame = 0;
 			time = 0;
@@ -142,6 +184,8 @@ package net.natpat
 		
 		public function setOffset(x:int, y:int):void
 		{
+			if (x <= 0) x += width;
+			if (y <= 0) y += height;
 			offset.x = x;
 			offset.y = y;
 		}
@@ -151,6 +195,45 @@ package net.natpat
 			defaultAnim = anims[name];
 		}
 		
+		
+		public function filterAnim(name:String, filter:BitmapFilter, extraSpaceMult:Number = 1.5):void
+		{
+			var oldAnim:Animation = anims[name];
+			var strip:BitmapData = new BitmapData(width * extraSpaceMult * oldAnim.length, height * extraSpaceMult, true, 0);
+			var newW:int = width * extraSpaceMult;
+			var newH:int = height * extraSpaceMult;
+			var glowOffset:Point = new Point((width - newW)/2, (height - newH)/2);
+			
+			var r:Rectangle = new Rectangle(0, 0, width, height);
+			var p:Point = glowOffset.clone();
+			p.x *= -1;
+			p.y *= -1;
+			
+			
+			for (var i:int = 0; i < oldAnim.length; i++)
+			{
+				trace(r.width);
+				trace(r.height);
+				r.x = oldAnim.frames[i].x * width - width + offset.x;
+				r.y = oldAnim.frames[i].y * height - height + offset.y;
+				strip.copyPixels(bitmapData, r, p);
+				p.x += newW;
+				
+				oldAnim.frames[i].x = i;
+				
+				oldAnim.frames[i].y = 0;
+			}
+			
+			strip.applyFilter(strip, strip.rect, GC.ZERO, filter);
+			
+			var glow:GlowAnim = new GlowAnim(strip, glowOffset, newW, newH);
+			glow.frames = oldAnim.frames;
+			glow.length = oldAnim.length;
+			glow.name = oldAnim.name;
+			glow.repeatable = oldAnim.repeatable;
+			
+			anims[name] = glow;
+		}
 	}
 
 }
@@ -190,5 +273,26 @@ internal class Animation
 		this.frames = frames;
 		this.repeatable = repeatable;
 		length = frames.length;
+	}
+}
+
+import flash.display.BitmapData;
+import flash.geom.Point;
+
+internal class GlowAnim extends Animation
+{
+	
+	public var bd:BitmapData;
+	public var offset:Point;
+	public var newW:int;
+	public var newH:int;
+	
+	public function GlowAnim(bd:BitmapData, offset:Point, newW:int, newH:int)
+	{
+		super(null, new Vector.<FrameData>(), true);
+		this.bd = bd;
+		this.offset = offset;
+		this.newW = newW;
+		this.newH = newH;
 	}
 }

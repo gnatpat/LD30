@@ -4,6 +4,7 @@ package net.natpat
 	import flash.events.Event;
 	import flash.geom.Point;
 	import flash.display.BitmapData;
+	import flash.display.Bitmap;
 	
 	/**
 	 * ...
@@ -134,6 +135,13 @@ package net.natpat
 			offset.y = Math.random() * intensity - (intensity / 2);
 			camera.x += offset.x;
 			camera.y += offset.y;
+		}
+		
+		public static function loadBitmapDataFromSource(source:*):BitmapData
+		{
+			if (source is Class) return Bitmap(new source).bitmapData;
+			if (source is BitmapData) return source;
+			return null;
 		}
 	}
 

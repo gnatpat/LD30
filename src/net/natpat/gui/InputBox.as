@@ -79,6 +79,11 @@ package net.natpat.gui
 			inputField.y = _y;
 		}
 		
+		public function get text():String
+		{
+			return inputField.text;
+		}
+		
 		public function render():void 
 		{
 			

@@ -1,5 +1,6 @@
 package net.natpat.gui 
 {
+	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
@@ -60,7 +61,7 @@ package net.natpat.gui
 		 * @param	asset				The name of the asset is Assets to use for this button
 		 */
 		 
-		public function Button(x:int, y:int, width:int, height:int, releasedFunction:Function, backIndex:int = -1, overIndex:int = -1, pressedIndex:int = -1, releasedIndex:int = -1, imageIndex:int = -1, asset:String = "LOGIN_BUTTONS", textOverlay:String = "", textGC.SIZE:int = 2)
+		public function Button(source:*, x:int, y:int, width:int, height:int, releasedFunction:Function, backIndex:int = -1, overIndex:int = -1, pressedIndex:int = -1, releasedIndex:int = -1, imageIndex:int = -1, textOverlay:String = "", textSize:int = 1)
 		{
 			this.x = x;
 			this.y = y;
@@ -70,7 +71,7 @@ package net.natpat.gui
 			
 			renderLocation = new Point(x, y);
 			
-			bitmapData = Assets[asset];
+			bitmapData = GV.loadBitmapDataFromSource(source);
 			
 			var bWidth:int = bitmapData.width;
 			
@@ -112,7 +113,7 @@ package net.natpat.gui
 			
 			if (textOverlay != "")
 			{
-				text = new Text(x, y, textOverlay, textGC.SIZE, false, 0x000000);
+				text = new Text(x, y, textOverlay, textSize, false, 0x000000);
 				hasText = true;
 			}
 			
@@ -145,7 +146,7 @@ package net.natpat.gui
 			clipRectangle = backRect;
 			
 			//If the mouse is over the button display funky graphics by changing the clip rectangle!
-			if (GV.collidePoint(Input.mouseX, Input.mouseY, x, y, width, height))
+			if (GV.pointInRect(Input.mouseX, Input.mouseY, x, y, width, height))
 			{
 				if (Input.mouseDown)
 				{

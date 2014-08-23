@@ -25,9 +25,9 @@
 		 * @param	frameWidth		Frame width.
 		 * @param	frameHeight		Frame height.
 		 */
-		public function Emitter(source:BitmapData, frameWidth:uint = 0, frameHeight:uint = 0) 
+		public function Emitter(source:*, frameWidth:uint = 0, frameHeight:uint = 0) 
 		{
-			setSource(source, frameWidth, frameHeight);
+			setSource(GV.loadBitmapDataFromSource(source), frameWidth, frameHeight);
 			frames = [0];
 		}
 		

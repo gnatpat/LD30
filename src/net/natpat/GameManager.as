@@ -1,5 +1,4 @@
-package net.natpat 
-{
+package net.natpat {
 	
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;

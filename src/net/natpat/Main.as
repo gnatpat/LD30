@@ -1,3 +1,4 @@
+
 package net.natpat
 {
 	import flash.display.Sprite;
