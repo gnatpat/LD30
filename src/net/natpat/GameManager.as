@@ -3,6 +3,7 @@ package net.natpat {
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.Shape;
+	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import net.natpat.gui.Button;
 	import net.natpat.gui.InputBox;
@@ -34,8 +35,13 @@ package net.natpat {
 		public var wm:WaypointManager;
 		
 		public var pathGraphic:Shape;
+		public var mouseLine:Shape;
 		
 		public var oldLength:int = 0;
+		
+		public var curvePoint:Point;
+		
+		public var ship:Ship;
 		
 		public function GameManager(stageWidth:int, stageHeight:int) 
 		{
@@ -53,22 +59,23 @@ package net.natpat {
 			
 			wm = new WaypointManager(renderer);
 			
-			for(var i:int = 0; i < 50; i++)
+			for(var i:int = 0; i < 70; i++)
 			{
 				wm.add(new Waypoint(GV.rand(GC.SCREEN_WIDTH), GV.rand(GC.SCREEN_HEIGHT)));
 			}
 			
-			var w:Waypoint = new Waypoint(GV.rand(GC.SCREEN_WIDTH), GV.rand(GC.SCREEN_HEIGHT));
-			wm.add(w);
-			Waypoint.selected = w;
+			for(var i:int = 0; i < 10; i++)
+			{
+				wm.add(new Port(GV.rand(GC.SCREEN_WIDTH), GV.rand(GC.SCREEN_HEIGHT), "Port"));
+			}
 			
 			wm.connectWaypoints();
 			
-			GV.makingPath = true;
-			
 			pathGraphic = new Shape();
-			pathGraphic.graphics.moveTo(w.x + 4, w.y + 4);
 			pathGraphic.graphics.lineStyle(1, 0, 1);
+			
+			mouseLine = new Shape();
+			mouseLine.graphics.lineStyle(1, 0, 1);
 			
 		}
 		
@@ -77,11 +84,17 @@ package net.natpat {
 			renderer.lock();
 			
 			//Render the background
-			renderer.fillRect(new Rectangle(0, 0, renderer.width, renderer.height), 0xffffff);
+			renderer.fillRect(new Rectangle(0, 0, renderer.width, renderer.height), 0x68c8ff);
 			
 			wm.render();
 			
 			renderer.draw(pathGraphic);
+			renderer.draw(mouseLine);
+			
+			if (ship != null)
+			{
+				ship.render(GV.screen);
+			}
 			
 			GuiManager.render();
 			
@@ -95,15 +108,55 @@ package net.natpat {
 			
 			wm.update();
 			
-			if (oldLength != GV.currentPath.length)
+			if (GV.makingRoute)
 			{
-				pathGraphic.graphics.lineTo(GV.currentPath[oldLength].to.x + 4, GV.currentPath[oldLength].to.y + 4);
-				oldLength = GV.currentPath.length;
+				if (oldLength < GV.currentRoute.length)
+				{
+					drawLine(GV.currentRoute[oldLength]);
+					oldLength = GV.currentRoute.length;
+				}
+				else if (oldLength > GV.currentRoute.length)
+				{
+					pathGraphic.graphics.clear();
+					pathGraphic.graphics.lineStyle(1, 0, 1);
+					for each(var wc:WaypointConnection in GV.currentRoute)
+					{
+						drawLine(wc);
+					}
+					oldLength = GV.currentRoute.length;
+				}
+				
+				mouseLine.graphics.clear();
+				if (Input.mouseDown)
+				{
+					mouseLine.graphics.lineStyle(1, 0, 1);
+					mouseLine.graphics.moveTo(Waypoint.selected.x, Waypoint.selected.y);
+					mouseLine.graphics.lineTo(Input.mouseX, Input.mouseY);
+				}
+			}
+			else
+			{
+				if (GV.currentRoute.length != 0)
+				{
+					ship = new Ship(new Route(GV.currentRoute, pathGraphic));
+					pathGraphic = new Shape();
+					GV.currentRoute = new Vector.<WaypointConnection>();
+				}
+			}
+			
+			if (ship != null)
+			{
+				ship.update();
 			}
 			
 			Input.update();
 		}
 		
+		public function drawLine(wc:WaypointConnection):void
+		{
+			pathGraphic.graphics.moveTo(wc.from.x, wc.from.y);
+			pathGraphic.graphics.lineTo(wc.to.x, wc.to.y);
+		}
 	}
 
 }

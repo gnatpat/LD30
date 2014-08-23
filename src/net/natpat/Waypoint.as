@@ -34,7 +34,7 @@ package net.natpat
 		
 		public function update():void
 		{
-			if (GV.pointInRect(Input.mouseX, Input.mouseY, x, y, 8, 8))
+			if (GV.pointInRect(Input.mouseX, Input.mouseY, x - 4, y - 4, 8, 8))
 			{
 				mouseOver = this;
 				greenNeighbours();
@@ -65,13 +65,27 @@ package net.natpat
 		
 		public function clicked():void
 		{
-			if (selected == null) return;
-			if (!GV.makingPath) return;
+			if (selected != null && GV.makingRoute) connectPath();
+		}
+		
+		public function connectPath():void
+		{
+			for (var i:int = 0; i < GV.currentRoute.length; i++)
+			{
+				if (GV.currentRoute[i].from == this)
+				{
+					GV.currentRoute.splice(i, GV.currentRoute.length - i);
+					selected = this;
+					return;
+				}
+			}
+				
 			var wc:WaypointConnection = selected.isConnectedTo(this);
 			if (wc == null) return;
-			GV.currentPath.push(wc);
+			
 			selected = this;
 			
+			GV.currentRoute.push(wc);
 		}
 		
 		public function isConnectedTo(w:Waypoint):WaypointConnection
@@ -91,7 +105,7 @@ package net.natpat
 		
 		public function render(buffer:BitmapData):void
 		{
-			buffer.fillRect(new Rectangle(x, y, 8, 8), greenb ? 0x00ff00 : (mouseOver == this ? 0x0000ff : (selected == this ? 0x990099 : 0xff0000)));
+			buffer.fillRect(new Rectangle(x - 4, y - 4, 8, 8), greenb ? 0x00ff00 : (mouseOver == this ? 0x0000ff : (selected == this ? 0x990099 : 0xff0000)));
 			greenb = false;
 		}
 	}

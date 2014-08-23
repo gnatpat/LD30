@@ -14,9 +14,9 @@ package net.natpat
 	public class GV 
 	{
 		
-		public static var makingPath:Boolean = false;
+		public static var makingRoute:Boolean = false;
 		
-		public static var currentPath:Vector.<WaypointConnection> = new Vector.<WaypointConnection>();
+		public static var currentRoute:Vector.<WaypointConnection> = new Vector.<WaypointConnection>();
 		
 		/**
 		 * Reference to the stage

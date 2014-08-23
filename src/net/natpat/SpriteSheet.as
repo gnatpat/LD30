@@ -37,6 +37,7 @@ package net.natpat
 			this.width = width;
 			this.height = height; 
 			offset = new Point(0, 0);
+			setOffset(0, 0);
 			
 			anims = new Object();
 			point = new Point();
@@ -111,6 +112,7 @@ package net.natpat
 				}
 			}
 		}
+		
 		
 		public function render(x:int, y:int):void
 		{
