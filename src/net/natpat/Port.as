@@ -54,6 +54,11 @@ package net.natpat
 		
 		override public function clicked():void 
 		{
+			if (GV.debuggingConnections)
+			{
+				super.clicked();
+				return;
+			}
 			if (GV.makingRoute)
 			{
 				connectPath();
@@ -75,18 +80,6 @@ package net.natpat
 		override public function update():void 
 		{
 			super.update();
-			if (mouseOver == this)
-			{
-				ss.changeAnim("redover");
-			}
-			else if (selected == this)
-			{
-				ss.changeAnim("redsel");
-			}
-			else 
-			{
-				ss.changeAnim("red");
-			}
 		}
 		
 		

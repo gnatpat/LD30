@@ -21,6 +21,8 @@ package net.natpat
 		public static const SPRITE_ZOOM_RATIO:Number = 0.3;
 		
 		public static const MAX_ZOOM:Number = 5.5;
+		
+		public static const DIST_TO_COST_RATIO:int = 150;
 	}
 
 }

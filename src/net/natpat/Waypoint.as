@@ -1,7 +1,9 @@
 package net.natpat 
 {
 	import flash.display.BitmapData;
+	import flash.filters.GlowFilter;
 	import flash.geom.Rectangle;
+	import flash.sampler.NewObjectSample;
 	import net.natpat.utils.WaypointConnection;
 	/**
 	 * ...
@@ -28,6 +30,8 @@ package net.natpat
 		
 		public var hasPirate:Boolean = false;
 		
+		public var id:int = 0;
+		
 		public function Waypoint(x:int, y:int) 
 		{
 			this.x = x;
@@ -37,12 +41,21 @@ package net.natpat
 			
 			ss = new SpriteSheet(Assets.PORTS, 95, 95, 0.2);
 			ss.addAnim("red", [[0, 0, 0.1]], true);
+			ss.addAnim("redover", [[0, 0, 0.1]], true);
+			ss.addAnim("redsel", [[0, 0, 0.1]], true);
+			ss.filterAnim("redover", new GlowFilter(0xcccc00, 1, 32, 32, 2 ), 1.3);
+			ss.filterAnim("redsel", new GlowFilter(0x0000cc, 1, 32, 32, 2), 1.3);
 			
 			ss.changeAnim("red");
 		}
 		
 		public function update():void
 		{
+			if (GV.debuggingConnections)
+			{
+				if (GV.w == this) selected = this;
+				else if (selected == this) selected = null;
+			}
 			if (GV.pointInRect(GV.mouseX, GV.mouseY, x-ss.getWidth()/2, y - ss.getHeight()/2, ss.getWidth(), ss.getHeight()))
 			{
 				mouseOver = this;
@@ -63,6 +76,18 @@ package net.natpat
 				greenNeighbours();
 			}
 			
+			if (mouseOver == this)
+			{
+				ss.changeAnim("redover");
+			}
+			else if (selected == this)
+			{
+				ss.changeAnim("redsel");
+			}
+			else 
+			{
+				ss.changeAnim("red");
+			}
 			ss.update();
 		}
 		
@@ -76,6 +101,31 @@ package net.natpat
 		
 		public function clicked():void
 		{
+			if (GV.debuggingConnections) 
+			{
+				Input.mouseDown = false;
+				if (GV.w == this)
+				{
+					GV.w = null;
+					return;
+				}
+				
+				if (GV.w == null)
+				{
+					GV.w = this;
+					return;
+				}
+				
+				if (isConnectedTo(GV.w) == null) 
+				{
+					return;
+				}
+				
+				trace("removeConnection(" + id + ", " + GV.w.id + ");");
+				wm.removeConnection(id, GV.w.id);
+				GV.w = null;
+				return;
+			}
 			if (selected != null && GV.makingRoute) connectPath();
 		}
 		
@@ -109,6 +159,19 @@ package net.natpat
 			return null;
 		}
 		
+		public function removeConnectionTo(w:Waypoint):void
+		{
+			
+			for (var i:int = 0; i < connections.length; i++)
+			{
+				if (connections[i].to == w)
+				{
+					connections.splice(i, 1);
+					return;
+				}
+			}
+		}
+		
 		public function green():void
 		{
 			greenb = true;
@@ -118,6 +181,10 @@ package net.natpat
 		{
 			ss.render(buffer, x, y);
 			greenb = false;
+			for each (var c:WaypointConnection in connections)
+			{
+				c.render();
+			}
 		}
 		
 		public function clearPirate():void

@@ -35,9 +35,13 @@ package net.natpat
 		
 		public static var shipCost:int = 50;
 		
+		public static var w:Waypoint;
+		
+		public static const debuggingConnections:Boolean = true;
+		
 		public static function get routeCost():int
 		{
-			return int(routeDistance / 100) + shipCost;
+			return int(routeDistance / GC.DIST_TO_COST_RATIO) + shipCost;
 		}
 		
 		public static function get mouseX():int
