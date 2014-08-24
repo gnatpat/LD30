@@ -5,6 +5,9 @@ package net.natpat
 	import flash.geom.Point;
 	import flash.display.BitmapData;
 	import flash.display.Bitmap;
+	import net.natpat.gui.Button;
+	import net.natpat.gui.GuiManager;
+	import net.natpat.gui.IGuiElement;
 	import net.natpat.utils.WaypointConnection;
 	
 	/**
@@ -13,6 +16,8 @@ package net.natpat
 	 */
 	public class GV 
 	{
+		
+		public static var onGUI:IGuiElement = null;
 		
 		public static var makingRoute:Boolean = false;
 		
@@ -26,6 +31,8 @@ package net.natpat
 		
 		public static var gold:int = 100;
 		
+		public static var shipCost:int = 50;
+		
 		public static function get mouseX():int
 		{
 			return GV.camera.x + ( -GC.SCREEN_WIDTH / 2 + Input.mouseX) * GV.zoom;
@@ -36,6 +43,10 @@ package net.natpat
 			return GV.camera.y + ( -GC.SCREEN_HEIGHT / 2 + Input.mouseY) * GV.zoom;
 		}
 		
+		public static function get canClick():Boolean
+		{
+			return (onGUI == null);
+		}
 		
 		public static function spendGold(gold:int, x:int, y:int):void
 		{
@@ -49,12 +60,12 @@ package net.natpat
 		
 		public static function getScreenX(x:int):int
 		{
-			return (x - GV.camera.x - (GC.SCREEN_WIDTH / 2 * GV.zoom)) * 1/GV.zoom;
+			return (x - GV.camera.x + (GC.SCREEN_WIDTH / 2 * GV.zoom)) * 1/GV.zoom;
 		}
 		
 		public static function getScreenY(y:int):int
 		{
-			return (y - GV.camera.y - (GC.SCREEN_HEIGHT / 2 * GV.zoom)) * 1/GV.zoom;
+			return (y - GV.camera.y + (GC.SCREEN_HEIGHT / 2 * GV.zoom)) * 1/GV.zoom;
 		}
 		
 		/**

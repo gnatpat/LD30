@@ -7,6 +7,7 @@ package net.natpat.gui
 	import flash.text.TextFormat;
 	import flash.filters.GlowFilter;
 	import flash.filters.BitmapFilterQuality;
+	import flash.text.TextFormatAlign;
 	import flash.utils.ByteArray;
 	import net.natpat.gui.IGuiElement;
 	import net.natpat.GV;
@@ -92,6 +93,7 @@ package net.natpat.gui
 			
 			//Create the text format.
 			_form = new TextFormat(_font, _SIZE, colour)
+			//_form.align = TextFormatAlign.CENTER;
 			
 			//Set the TextField to use embedded fonts, so we can use Visitor
 			_field.embedFonts = true;
