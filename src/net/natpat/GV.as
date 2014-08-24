@@ -37,7 +37,7 @@ package net.natpat
 		
 		public static var w:Waypoint;
 		
-		public static const debuggingConnections:Boolean = false;
+		public static const debuggingConnections:Boolean = true
 		
 		public static function get routeCost():int
 		{

@@ -104,7 +104,6 @@ package net.natpat
 		
 		override public function render(buffer:BitmapData):void
 		{
-			
 			for each (var c:WaypointConnection in connections)
 			{
 				c.render();
