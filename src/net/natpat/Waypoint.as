@@ -48,7 +48,7 @@ package net.natpat
 				mouseOver = this;
 				greenNeighbours();
 				
-				if (Input.mouseDown)
+				if (Input.mouseDown && GV.canClick)
 				{
 					clicked();
 				}

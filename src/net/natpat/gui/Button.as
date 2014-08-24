@@ -113,7 +113,10 @@ package net.natpat.gui
 			
 			if (textOverlay != "")
 			{
-				text = new Text(x, y, textOverlay, textSize, false, 0x000000);
+				var oldSize:int = Text.SIZE;
+				Text.SIZE = textSize;
+				text = new Text(x, y, textOverlay, 1, false, 0x000000);
+				Text.SIZE = oldSize;
 				hasText = true;
 			}
 			
@@ -148,6 +151,7 @@ package net.natpat.gui
 			//If the mouse is over the button display funky graphics by changing the clip rectangle!
 			if (GV.pointInRect(Input.mouseX, Input.mouseY, x, y, width, height))
 			{
+				GV.onGUI = this;
 				if (Input.mouseDown)
 				{
 					clipRectangle = pressedRect;
@@ -161,8 +165,7 @@ package net.natpat.gui
 				{
 					clipRectangle = overRect;
 				}
-			}
-			
+			} else if (GV.onGUI == this) GV.onGUI = null;
 			renderLocation.x = x;
 			renderLocation.y = y;
 			

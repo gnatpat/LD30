@@ -5,6 +5,8 @@ package net.natpat
 	import flash.filters.GlowFilter;
 	import flash.geom.Matrix;
 	import flash.geom.Rectangle;
+	import net.natpat.gui.GuiManager;
+	import net.natpat.gui.PortGui;
 	import net.natpat.gui.Text;
 	import net.natpat.utils.WaypointConnection;
 	/**
@@ -63,10 +65,9 @@ package net.natpat
 			}
 			else
 			{
-				GV.makingRoute = true;
-				selected = this;
-				GV.routePort = this;
-				GV.routeIndex = 0;
+				Input.mouseDown = false;
+				GuiManager.add(new PortGui(this, GV.getScreenX(x + 10), GV.getScreenY(y - 150)));
+				trace(GV.getScreenX(x + 10), GV.getScreenY(y - 150));
 			}
 		}
 		
@@ -108,6 +109,14 @@ package net.natpat
 		public function removeShipByIndex(index:int):void
 		{
 			ships[index] = null;
+		}
+		
+		public function startRoute(index:int):void
+		{
+			GV.makingRoute = true;
+			selected = this;
+			GV.routePort = this;
+			GV.routeIndex = index;
 		}
 	}
 

@@ -8,6 +8,7 @@ package net.natpat {
 	import flash.geom.Rectangle;
 	import net.natpat.gui.Button;
 	import net.natpat.gui.InputBox;
+	import net.natpat.gui.PortGui;
 	import net.natpat.particles.Emitter;
 	import net.natpat.utils.Sfx;
 	
@@ -331,8 +332,6 @@ package net.natpat {
 			}
 			
 			gold.text = "Gold: " + GV.gold;
-			
-			trace(GV.mouseX, GV.mouseY);
 			
 			Input.update();
 		}
