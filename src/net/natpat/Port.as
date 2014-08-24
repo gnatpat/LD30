@@ -85,6 +85,10 @@ package net.natpat
 		
 		override public function render(buffer:BitmapData):void
 		{
+			for each (var c:WaypointConnection in connections)
+			{
+				c.render();
+			}
 			text.render(buffer, x, y - 40 - 7 * (GV.zoom - 1), true, GC.SPRITE_ZOOM_RATIO * 2, true);
 			ss.render(buffer, x, y);
 			var m:Matrix = new Matrix;

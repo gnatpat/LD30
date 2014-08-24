@@ -486,7 +486,7 @@ package net.natpat {
 			
 			gold.text = "Gold: " + GV.gold;
 			
-			trace(GV.mouseX, GV.mouseY);
+			//trace(GV.mouseX, GV.mouseY);
 			
 			Input.update();
 		}
