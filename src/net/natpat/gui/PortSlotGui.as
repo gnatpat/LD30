@@ -47,9 +47,9 @@ package net.natpat.gui
 			if (hasRoute)
 			{
 				back = new Button(new BitmapData(width, height, true, 0xffcccccc), x, y, width, height, nuthin, 0, -1, -1, -1, -1); 
-				dest = new Text(x, y, port.ships[index].route.to.name, 3, false, 0);
+				dest = new Text(x, y, port.ships[index].route.to.name, 24, false, 0);
 				dest.x = x + (width - dest.width) / 2;
-				gold = new Text(x, y + 30, port.ships[index].route.gold + " gold", 2, false, 0);
+				gold = new Text(x, y + 30, port.ships[index].route.gold + " gold", 18, false, 0);
 				gold.x = x + (width - gold.width) / 2;
 			}
 			

@@ -113,10 +113,7 @@ package net.natpat.gui
 			
 			if (textOverlay != "")
 			{
-				var oldSize:int = Text.SIZE;
-				Text.SIZE = textSize;
-				text = new Text(x, y, textOverlay, 1, false, 0x000000);
-				Text.SIZE = oldSize;
+				text = new Text(x, y, textOverlay, textSize, false, 0x000000);
 				hasText = true;
 			}
 			

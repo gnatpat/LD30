@@ -24,7 +24,7 @@ package net.natpat.gui
 	 */
 	public class Text implements IGuiElement
 	{
-		[Embed(source = "../utils/Volter__28Goldfish_29.ttf", embedAsCFF="false", fontFamily = 'default', mimeType='application/x-font')]
+		[Embed(source = "../utils/GOTHICBI.TTF", embedAsCFF="false", fontFamily = 'default', mimeType='application/x-font')]
 		private static const VISITOR_FONT:Class;
 		
 		/**
@@ -67,7 +67,7 @@ package net.natpat.gui
 		 * @param	_getTextString	Function that returns the string to display
 		 * @param	... args		Arguments to pass to the function
 		 */
-		public function Text(x:int, y:int, text:String, scale:int = 1, hasOutline:Boolean = true, colour:uint = 0xffffff)
+		public function Text(x:int, y:int, text:String, size:int = 18, hasOutline:Boolean = false, colour:uint = 0xffffff)
 		{
 			this.x = x;
 			this.y = y;
@@ -83,16 +83,16 @@ package net.natpat.gui
 				yCentre = true;
 			}
 			
-			this.scale = scale;
+			this.scale = 1;
+			this.colour = colour;
 			
 			this.scroll = scroll;
 			
 			//Gets the font and GC.SIZE from the static variables and puts them into local ones, so the font and GC.SIZE are "saved"
 			_font = font;
-			_SIZE = SIZE;
 			
 			//Create the text format.
-			_form = new TextFormat(_font, _SIZE, colour)
+			_form = new TextFormat(_font, size, colour)
 			//_form.align = TextFormatAlign.CENTER;
 			
 			//Set the TextField to use embedded fonts, so we can use Visitor
@@ -100,7 +100,6 @@ package net.natpat.gui
 			
 			//Set the antiAlias type to Advanced, so we can set sharpness so the font isn't yucky and blurry
 			_field.antiAliasType = AntiAliasType.ADVANCED;
-			_field.sharpness = 400;
 			
 			//Set the text in the text field.
 			_field.text = _text = text;
@@ -150,8 +149,10 @@ package net.natpat.gui
 			//Set the textField's formatter to _form
 			_field.setTextFormat(_form);
 			
+			_form.color = colour
+			
 			//For testing purposes, set _textWidth and height to how big the text field actually needs to be
-			_textWidth = _field.textWidth + 4;
+			_textWidth = _field.textWidth + 6;
 			_textHeight = _field.textHeight + 8;
 			
 			_width = _textWidth;

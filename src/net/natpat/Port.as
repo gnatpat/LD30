@@ -22,6 +22,8 @@ package net.natpat
 		
 		public var ships:Vector.<Ship>
 		
+		public var portAdded:Boolean = false;
+		
 		public function Port(x:int, y:int, name:String) 
 		{
 			this.name = name;
@@ -42,7 +44,7 @@ package net.natpat
 			
 			ss.filterAnim("redover", new GlowFilter(0xcccc00, 1, 32, 32, 2 ), 1.3);
 			ss.filterAnim("redsel", new GlowFilter(0x0000cc, 1, 32, 32, 2), 1.3);
-			var textObj:Text =  new Text(0, 0, name, 3, false);
+			var textObj:Text =  new Text(0, 0, name, 24, false);
 			var buffer:BitmapData = new BitmapData(textObj.width, textObj.height, true, 0)
 			textObj.renderOnBuffer(buffer);
 			text = new SpriteSheet(buffer, textObj.width, textObj.height);
@@ -67,7 +69,6 @@ package net.natpat
 			{
 				Input.mouseDown = false;
 				GuiManager.add(new PortGui(this, GV.getScreenX(x + 10), GV.getScreenY(y - 150)));
-				trace(GV.getScreenX(x + 10), GV.getScreenY(y - 150));
 			}
 		}
 		
@@ -91,7 +92,7 @@ package net.natpat
 		
 		override public function render(buffer:BitmapData):void
 		{
-			text.render(buffer, x, y - 33 - 10 * (GV.zoom - 1), true, GC.SPRITE_ZOOM_RATIO * 2, true);
+			text.render(buffer, x, y - 40 - 7 * (GV.zoom - 1), true, GC.SPRITE_ZOOM_RATIO * 2, true);
 			ss.render(buffer, x, y);
 			var m:Matrix = new Matrix;
 		}

@@ -50,6 +50,10 @@ package net.natpat {
 		
 		public var gold:Text;
 		
+		public var routeStarted:Boolean = false;
+		
+		public var costText:Text;
+		
 		public function GameManager(stageWidth:int, stageHeight:int) 
 		{
 			
@@ -73,7 +77,6 @@ package net.natpat {
 			wm.add(new Port(7965, 1650, "Bristol"));
 			wm.add(new Waypoint(7490, 2090));
 			wm.add(new Waypoint(7700, 1872));
-			wm.waypoints[1].hasPirate = true;
 			wm.add(new Port(7724, 1594, "Dublin"));
 			wm.add(new Port(8069, 1934, "Calais"));
 			wm.add(new Port(7784, 2234, "Bayonne"));
@@ -128,8 +131,11 @@ package net.natpat {
 			
 			GV.zoom = 2.3;
 			
-			gold = new Text(10, 10, "Gold: 0", 2);
+			gold = new Text(10, 10, "Gold: 0", 20);
 			GuiManager.add(gold);
+			
+			costText = new Text(0, 0, "0", 16);
+			GuiManager.add(costText);
 		}
 		
 		public function render():void
@@ -174,14 +180,17 @@ package net.natpat {
 			{
 				if (oldLength < GV.currentRoute.length)
 				{
+					GV.routeDistance+= GV.currentRoute[oldLength].distance;
 					drawLine(GV.currentRoute[oldLength]);
 					oldLength = GV.currentRoute.length;
 				}
 				else if (oldLength > GV.currentRoute.length)
 				{
 					pathGraphic.graphics.clear();
+					GV.routeDistance = 0;
 					for each(var wc:WaypointConnection in GV.currentRoute)
 					{
+						GV.routeDistance+= wc.distance;
 						drawLine(wc);
 					}
 					oldLength = GV.currentRoute.length;
@@ -193,6 +202,33 @@ package net.natpat {
 					mouseLine.graphics.lineStyle(15, 0x3333ff, 0.6);
 					mouseLine.graphics.moveTo(Waypoint.selected.x, Waypoint.selected.y);
 					mouseLine.graphics.lineTo(GV.mouseX, GV.mouseY);
+					var length:int = Math.sqrt((Waypoint.selected.x - GV.mouseX) * (Waypoint.selected.x - GV.mouseX)
+					                         + (Waypoint.selected.y - GV.mouseY) * (Waypoint.selected.y - GV.mouseY)) / 100;
+					var cost:int = GV.routeCost + length;
+					if (cost > GV.gold)
+					{
+						costText.colour = 0xff0000;
+					}
+					else
+					{
+						costText.colour = 0xffffff;
+					}
+					costText.text = "" + cost;
+					costText.x = Input.mouseX;
+					costText.y = Input.mouseY - 30;
+				}
+				if (Input.mouseReleased)
+				{
+					if (routeStarted)
+					{
+						GV.makingRoute = false;
+						Waypoint.selected = null;
+						GV.currentRoute = new Vector.<WaypointConnection>();
+						pathGraphic = new Shape();
+						costText.x = -100;
+						costText.y = -100;
+					}
+					routeStarted = !routeStarted;
 				}
 			}
 			else
@@ -200,14 +236,26 @@ package net.natpat {
 				if (GV.currentRoute.length != 0)
 				{
 					drawLine(GV.currentRoute[oldLength]);
+					GV.routeDistance+= GV.currentRoute[oldLength].distance;
 					
-					addShip();
+					if (GV.routeCost < GV.gold)
+					{
+						GV.spendGold(GV.routeCost, Input.mouseX, Input.mouseY);
+					
+						addShip();
+					}
 					
 					pathGraphic = new Shape();
 					GV.currentRoute = new Vector.<WaypointConnection>();
+					
+					costText.x = -100;
+					costText.y = -100;
 				}
 				mouseLine.graphics.clear();
+				routeStarted = false;
 			}
+			
+			trace(routeStarted);
 			
 			sm.update();
 			

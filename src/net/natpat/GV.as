@@ -23,15 +23,22 @@ package net.natpat
 		
 		public static var currentRoute:Vector.<WaypointConnection> = new Vector.<WaypointConnection>();
 		
+		public static var routeDistance:int = 0;
+		
 		public static var routePort:Port = null
 		
 		public static var routeIndex:int = 0;
 		
 		public static var zoom:Number = 5;
 		
-		public static var gold:int = 100;
+		public static var gold:int = 53;
 		
 		public static var shipCost:int = 50;
+		
+		public static function get routeCost():int
+		{
+			return int(routeDistance / 100) + shipCost;
+		}
 		
 		public static function get mouseX():int
 		{
