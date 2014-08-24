@@ -14,11 +14,13 @@ package net.natpat
 	
 		public static const ZERO:Point = new Point(0, 0);
 		
-		public static const MAX_CONNECTION_LENGTH:int = 100;
+		public static const MAX_CONNECTION_LENGTH:int = 400;
 		
 		public static const CAMERA_SCROLL:Number = 300;
 		
-		public static const SPRITE_ZOOM_RATIO:Number = 0.5
+		public static const SPRITE_ZOOM_RATIO:Number = 0.3;
+		
+		public static const MAX_ZOOM:Number = 5.5;
 	}
 
 }

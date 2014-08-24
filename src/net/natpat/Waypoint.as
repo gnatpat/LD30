@@ -24,17 +24,26 @@ package net.natpat
 		
 		public var ableToConnect:Boolean = false;
 		
+		public var ss:SpriteSheet;
+		
+		public var hasPirate:Boolean = false;
+		
 		public function Waypoint(x:int, y:int) 
 		{
 			this.x = x;
 			this.y = y;
 			
 			connections = new Vector.<WaypointConnection>();
+			
+			ss = new SpriteSheet(Assets.PORTS, 95, 95, 0.2);
+			ss.addAnim("red", [[0, 0, 0.1]], true);
+			
+			ss.changeAnim("red");
 		}
 		
 		public function update():void
 		{
-			if (GV.pointInRect(Input.mouseX, Input.mouseY, x - 4, y - 4, 8, 8))
+			if (GV.pointInRect(GV.mouseX, GV.mouseY, x-ss.getWidth()/2, y - ss.getHeight()/2, ss.getWidth(), ss.getHeight()))
 			{
 				mouseOver = this;
 				greenNeighbours();
@@ -53,6 +62,8 @@ package net.natpat
 			{
 				greenNeighbours();
 			}
+			
+			ss.update();
 		}
 		
 		public function greenNeighbours():void
@@ -105,8 +116,18 @@ package net.natpat
 		
 		public function render(buffer:BitmapData):void
 		{
-			buffer.fillRect(new Rectangle(x - 4, y - 4, 8, 8), greenb ? 0x00ff00 : (mouseOver == this ? 0x0000ff : (selected == this ? 0x990099 : 0xff0000)));
+			ss.render(buffer, x, y);
 			greenb = false;
+		}
+		
+		public function clearPirate():void
+		{
+			hasPirate = false;
+		}
+		
+		public function pirateKill():void
+		{
+			
 		}
 	}
 

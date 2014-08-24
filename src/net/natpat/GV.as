@@ -18,7 +18,44 @@ package net.natpat
 		
 		public static var currentRoute:Vector.<WaypointConnection> = new Vector.<WaypointConnection>();
 		
+		public static var routePort:Port = null
+		
+		public static var routeIndex:int = 0;
+		
 		public static var zoom:Number = 5;
+		
+		public static var gold:int = 100;
+		
+		public static function get mouseX():int
+		{
+			return GV.camera.x + ( -GC.SCREEN_WIDTH / 2 + Input.mouseX) * GV.zoom;
+		}
+		
+		public static function get mouseY():int
+		{
+			return GV.camera.y + ( -GC.SCREEN_HEIGHT / 2 + Input.mouseY) * GV.zoom;
+		}
+		
+		
+		public static function spendGold(gold:int, x:int, y:int):void
+		{
+			GV.gold -= gold;
+		}
+		
+		public static function makeGold(gold:int, x:int, y:int):void
+		{
+			GV.gold += gold;
+		}
+		
+		public static function getScreenX(x:int):int
+		{
+			return (x - GV.camera.x - (GC.SCREEN_WIDTH / 2 * GV.zoom)) * 1/GV.zoom;
+		}
+		
+		public static function getScreenY(y:int):int
+		{
+			return (y - GV.camera.y - (GC.SCREEN_HEIGHT / 2 * GV.zoom)) * 1/GV.zoom;
+		}
 		
 		/**
 		 * Reference to the stage

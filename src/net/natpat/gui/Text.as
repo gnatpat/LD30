@@ -179,10 +179,16 @@ package net.natpat.gui
 		
 		public function render():void
 		{
+			renderOnBuffer(GV.screen);
+		}
+		
+		public function renderOnBuffer(buffer:BitmapData):void
+		{
 			if (bitmapData == null) return; 
 			renderLocation.x = x;
 			renderLocation.y = y;
-			GV.screen.copyPixels(bitmapData, clipRectangle, renderLocation, null, null, true);
+			buffer.copyPixels(bitmapData, clipRectangle, renderLocation, null, null, true);
+		
 		}
 		
 		public function update():void

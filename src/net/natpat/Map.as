@@ -52,9 +52,9 @@ package net.natpat
 					}
 					else
 					{
-						r.x = 0;
-						r.width = Math.min(swidth, swidth - (quads[i].width - cx))
-						p.x = quads[0].width - cx;
+						r.x = Math.max(0, cx - quads[i].width);
+						r.width = Math.min(swidth, swidth - (quads[i].width - cx) + swidth / 2)
+						p.x = Math.max(0, quads[0].width - cx);
 					}
 					
 					if (y == 0)
@@ -65,9 +65,9 @@ package net.natpat
 					}
 					else
 					{
-						r.y = 0;
-						r.height  = Math.min(sheight, sheight - (quads[i].height  -cy))
-						p.y = quads[0].height - cy;
+						r.y = Math.max(0, cy - quads[i].height);
+						r.height  = Math.min(sheight, sheight - (quads[i].height - cy) + sheight / 2)
+						p.y = Math.max(0, quads[0].height - cy);
 					}
 					buffer.copyPixels(quads[i], r, p);
 				}

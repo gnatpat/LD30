@@ -29,11 +29,11 @@ package net.natpat
 		protected var point:Point;
 		protected var rect:Rectangle;
 		
-		protected var buffer:BitmapData;
-		
 		protected var bitmapData:BitmapData;
 		
-		public function SpriteSheet(source:*, width:int, height:int)
+		protected var masterScale:Number;
+		
+		public function SpriteSheet(source:*, width:int, height:int, scale:Number = 1)
 		{
 			this.width = width;
 			this.height = height; 
@@ -50,13 +50,13 @@ package net.natpat
 			frame = 0;
 			time = 0;
 			
-			buffer = GV.screen;
-			
 			bitmapData = GV.loadBitmapDataFromSource(source);
 			
 			addAnim("default", [[0, 0, 5]], true);
 			setDefault("default");
 			changeAnim("default");
+			
+			masterScale = scale;
 		}
 		
 		/**
@@ -115,11 +115,13 @@ package net.natpat
 		}
 		
 		
-		public function render(x:int, y:int, zoom:Boolean = true, zoomRatio:Number = GC.SPRITE_ZOOM_RATIO):void
+		public function render(buffer:BitmapData, x:int, y:int, zoom:Boolean = true, zoomRatio:Number = GC.SPRITE_ZOOM_RATIO, centre:Boolean = true ):void
 		{
 			if (anim == null) return;
 			
 			if (anim.frames.length == 0) return;
+			
+			if (masterScale != 1) zoom = true;
 			
 			var m:Matrix = new Matrix();
 			
@@ -130,14 +132,14 @@ package net.natpat
 			point.x = x;
 			point.y = y;
 			if (anim is GlowAnim)
-			{
-				point = point.add(GlowAnim(anim).offset);
-				
+			{	
 				r.x = fd.x * GlowAnim(anim).newW;
 				r.y = fd.y * GlowAnim(anim).newH;
 				
 				r.width = GlowAnim(anim).newW;
 				r.height = GlowAnim(anim).newH;
+				
+				renderbd = GlowAnim(anim).bd;
 			}
 			else
 			{
@@ -145,6 +147,8 @@ package net.natpat
 				r.y = fd.y * height - height + offset.y;
 				r.width = width;
 				r.height = height;
+				
+				renderbd = bitmapData;
 			}
 			
 			point.x -= GV.camera.x - (GC.SCREEN_WIDTH / 2 * GV.zoom);
@@ -156,6 +160,17 @@ package net.natpat
 			{
 				var scale:Number = 1 / (zoomRatio * (GV.zoom - 1) + 1);
 				
+				scale *= masterScale
+				
+				r.width *= scale;
+				r.height *= scale;
+				
+				if (centre)
+				{
+					point.x -= r.width / 2;
+					point.y -= r.height / 2;
+				}
+				
 				m.translate( -r.x - r.width / 2, -r.y - r.height / 2);
 				m.scale(scale, scale);
 				m.translate(r.width / 2 * scale, r.height / 2 * scale);
@@ -165,14 +180,16 @@ package net.natpat
 				r.x = point.x;
 				r.y = point.y
 				
-				r.width *= scale;
-				r.height *= scale;
-				
-				buffer.draw(bitmapData, m, null, null, r);
+				buffer.draw(renderbd, m, null, null, r, true);
 			}
 			else
 			{
-				buffer.copyPixels(bitmapData, r, point, null, null, true);
+				if (centre)
+				{
+					point.x -= r.width / 2;
+					point.y -= r.height / 2;
+				}
+				buffer.copyPixels(renderbd, r, point, null, null, true);
 			}
 		}
 		
@@ -186,6 +203,17 @@ package net.natpat
 		{
 			this.height = height;
 			rect.height = height;
+		}
+		
+		public function getWidth():int
+		{
+			return width * masterScale * (masterScale == 1 ? 1 : GV.zoom);
+		}
+		
+		
+		public function getHeight():int
+		{
+			return height * masterScale * (masterScale == 1 ? 1 : GV.zoom);
 		}
 		
 		public function changeAnim(name:String):void
@@ -237,8 +265,6 @@ package net.natpat
 			
 			for (var i:int = 0; i < oldAnim.length; i++)
 			{
-				trace(r.width);
-				trace(r.height);
 				r.x = oldAnim.frames[i].x * width - width + offset.x;
 				r.y = oldAnim.frames[i].y * height - height + offset.y;
 				strip.copyPixels(bitmapData, r, p);

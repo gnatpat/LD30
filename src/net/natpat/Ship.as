@@ -1,6 +1,7 @@
 package net.natpat 
 {
 	import flash.display.BitmapData;
+	import flash.geom.Matrix;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import net.natpat.utils.WaypointConnection;
@@ -11,6 +12,8 @@ package net.natpat
 	public class Ship 
 	{
 		
+		public var sm:ShipManager;
+		
 		public var route:Route;
 		
 		public var x:Number;
@@ -19,7 +22,7 @@ package net.natpat
 		public var xDest:int;
 		public var yDest:int;
 		
-		public var speed:Number = 40;
+		public var speed:Number = 60;
 		
 		public var dir:Point;
 		public var waypoint:int;
@@ -29,8 +32,15 @@ package net.natpat
 		
 		public var ss:SpriteSheet;
 		
-		public function Ship(route:Route) 
+		public var cost:int;
+		
+		public var canKillPirates:Boolean = false;
+		
+		public var homePort:Port;
+		
+		public function Ship(route:Route, cost:int = 50) 
 		{
+			
 			this.route = route;
 			waypoint = 0;
 		    dir = new Point();
@@ -46,7 +56,9 @@ package net.natpat
 			
 			ss = new SpriteSheet(Assets.SHIP, 100, 74);
 			
+			this.cost = cost;
 			
+			homePort = route.from;
 		}
 		
 		public function update():void
@@ -63,8 +75,27 @@ package net.natpat
 				if ((waypoint == route.connections.length - 1 && next == 1)
 				 || (waypoint == 0                            && next == -1))
 				{
+					if (waypoint == 0 && next == -1)
+					{
+						GV.makeGold(route.gold, x, y);
+					}
 					waypoint += next;
 					next = -next;
+				}
+				else
+				{
+					if (cc.to.hasPirate)
+					{
+						if (canKillPirates)
+						{
+							cc.to.clearPirate();
+						}
+						else
+						{
+							cc.to.pirateKill();
+							remove();
+						}
+					}
 				}
 				
 				waypoint += next;
@@ -73,6 +104,11 @@ package net.natpat
 			
 			ss.update();
 			
+		}
+		
+		public function remove():void
+		{
+			sm.removeShip(this);
 		}
 		
 		public function getDir():void
@@ -108,10 +144,13 @@ package net.natpat
 			return route.connections[waypoint];
 		}
 		
-		public function render(buffer:BitmapData):void
+		public function render(lineBuffer:BitmapData, buffer:BitmapData):void
 		{
-			GV.screen.draw(route.lineGraphic);
-			ss.render(x - 40, y - 65);
+			
+			var m:Matrix = new Matrix();
+			m.translate( -GV.camera.x + (GC.SCREEN_WIDTH * GV.zoom / 2), - GV.camera.y + (GC.SCREEN_HEIGHT * GV.zoom / 2));
+			lineBuffer.draw(route.lineGraphic, m);
+			ss.render(buffer, x, y, true, GC.SPRITE_ZOOM_RATIO * 1.5);
 		}
 		
 	}
