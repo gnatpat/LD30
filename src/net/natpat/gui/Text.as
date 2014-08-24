@@ -67,7 +67,7 @@ package net.natpat.gui
 		 * @param	_getTextString	Function that returns the string to display
 		 * @param	... args		Arguments to pass to the function
 		 */
-		public function Text(x:int, y:int, text:String, size:int = 18, hasOutline:Boolean = false, colour:uint = 0xffffff)
+		public function Text(x:int, y:int, text:String, size:int = 18, hasOutline:Boolean = false, colour:uint = 0xffffff, centre:Boolean = false)
 		{
 			this.x = x;
 			this.y = y;
@@ -93,7 +93,7 @@ package net.natpat.gui
 			
 			//Create the text format.
 			_form = new TextFormat(_font, size, colour)
-			//_form.align = TextFormatAlign.CENTER;
+			if (centre) _form.align = TextFormatAlign.CENTER;
 			
 			//Set the TextField to use embedded fonts, so we can use Visitor
 			_field.embedFonts = true;

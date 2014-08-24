@@ -24,6 +24,9 @@ package net.natpat
 		
 		public var portAdded:Boolean = false;
 		
+		public static var guiPort:Port;
+		public var gui:PortGui;
+		
 		public function Port(x:int, y:int, name:String) 
 		{
 			this.name = name;
@@ -72,19 +75,40 @@ package net.natpat
 			}
 			else
 			{
-				Input.mouseDown = false;
-				GuiManager.add(new PortGui(this, GV.getScreenX(x + 10), GV.getScreenY(y - 150)));
+				if (guiPort != this) 
+				{
+					Input.mouseDown = false;
+					gui = new PortGui(this, GV.getScreenX(x + 10), GV.getScreenY(y - 400))
+					GuiManager.add(gui);
+					guiPort = this;
+				}
 			}
 		}
 		
 		override public function update():void 
 		{
 			super.update();
+			if (gui != null && guiPort != this)
+			{
+				GuiManager.remove(gui);
+				gui = null;
+			}
+			if (guiPort == this && Input.mouseDown && GV.canClick)
+			{
+				GuiManager.remove(gui);
+				gui = null;
+				guiPort = null;
+			}
 		}
 		
 		
 		override public function render(buffer:BitmapData):void
 		{
+			
+			for each (var c:WaypointConnection in connections)
+			{
+				c.render();
+			}
 			text.render(buffer, x, y - 40 - 7 * (GV.zoom - 1), true, GC.SPRITE_ZOOM_RATIO * 2, true);
 			ss.render(buffer, x, y);
 			var m:Matrix = new Matrix;

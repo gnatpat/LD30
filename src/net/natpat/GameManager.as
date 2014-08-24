@@ -7,6 +7,7 @@ package net.natpat {
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import net.natpat.gui.Button;
+	import net.natpat.gui.Dialog;
 	import net.natpat.gui.InputBox;
 	import net.natpat.gui.PortGui;
 	import net.natpat.particles.Emitter;
@@ -53,6 +54,8 @@ package net.natpat {
 		public var routeStarted:Boolean = false;
 		
 		public var costText:Text;
+		
+		public var dialogUp:Boolean = false;
 		
 		public function GameManager(stageWidth:int, stageHeight:int) 
 		{
@@ -299,6 +302,9 @@ package net.natpat {
 			wm.add(new Port(9288, 1555, "Saint Petersburg"));
 			wm.add(new Port(9067, 1707, "Tallinn"));
 			wm.add(new Port(8489, 1104, "Bergen"));
+			wm.add(new Waypoint(7820, 1646));
+			wm.add(new Waypoint(7153, 1624));
+			wm.add(new Waypoint(7469, 1916));
 
 			
 			wm.connectWaypoints();
@@ -428,23 +434,19 @@ package net.natpat {
 			}
 			else
 			{
-				if (GV.currentRoute.length != 0)
+				if (GV.currentRoute.length != 0 && !dialogUp)
 				{
 					drawLine(GV.currentRoute[oldLength]);
 					GV.routeDistance+= GV.currentRoute[oldLength].distance;
 					
+					dialogUp = true;
+					
 					if (GV.routeCost <= GV.gold)
 					{
-						GV.spendGold(GV.routeCost, Input.mouseX, Input.mouseY);
-					
-						addShip();
+						GuiManager.add(new Dialog(addShip, clearRoute , "Set up a trade route between\n" + GV.routePort.name + " and " + Port(GV.currentRoute[oldLength].to).name + "?\n" +
+																   "It will cost " + GV.routeCost + " gold.", 16));
 					}
 					
-					pathGraphic = new Shape();
-					GV.currentRoute = new Vector.<WaypointConnection>();
-					
-					costText.x = -100;
-					costText.y = -100;
 				}
 				mouseLine.graphics.clear();
 				routeStarted = false;
@@ -486,15 +488,15 @@ package net.natpat {
 			
 			gold.text = "Gold: " + GV.gold;
 			
-			trace(GV.mouseX, GV.mouseY);
-			
 			Input.update();
 		}
 		
 		public function addShip():void
 		{
+			GV.spendGold(GV.routeCost, Input.mouseX, Input.mouseY);
 			var s:Ship = new Ship(new Route(GV.currentRoute, pathGraphic));
 			sm.addShip(s, GV.routePort, GV.routeIndex);
+			clearRoute();
 		}
 		
 		public function drawLine(wc:WaypointConnection):void
@@ -502,6 +504,17 @@ package net.natpat {
 			pathGraphic.graphics.lineStyle(15, 0x3333ff, 0.6);
 			pathGraphic.graphics.moveTo(wc.from.x, wc.from.y);
 			pathGraphic.graphics.lineTo(wc.to.x, wc.to.y);
+		}
+		
+		public function clearRoute():void
+		{
+			
+			dialogUp = false;
+			pathGraphic = new Shape();
+			GV.currentRoute = new Vector.<WaypointConnection>();
+			
+			costText.x = -100;
+			costText.y = -100;
 		}
 	}
 

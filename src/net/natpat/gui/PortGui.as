@@ -3,6 +3,7 @@ package net.natpat.gui
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.geom.Point;
+	import net.natpat.Assets;
 	import net.natpat.GV;
 	import net.natpat.Input;
 	import net.natpat.Port;
@@ -25,20 +26,17 @@ package net.natpat.gui
 		
 		public var port:Port;
 		
-		public var exit:Button;
-		
 		public function PortGui(port:Port, x:int, y:int) 
 		{
 			this.x = x;
 			this.y = y;
-			width = 110;
-			height = 190;
+			width = 300;
+			height = 333;
 			slots = new Vector.<PortSlotGui>(3);
-			slots[0] = new PortSlotGui(this, x + 10,  y + 10, 100, 50, port, 0);
-			slots[1] = new PortSlotGui(this, x + 10, y + 70, 100, 50, port, 1);
-			slots[2] = new PortSlotGui(this, x + 10, y + 130, 100, 50, port, 2);
-			back = new BitmapData(width, height, true, 0xff999999);
-			exit = new Button(new BitmapData(15, 15, true, 0xff990000), x + width - 7, y - 7, 15, 15, close, 0);
+			slots[0] = new PortSlotGui(this, x, y, 300, 333, port, 0);
+			slots[1] = new PortSlotGui(this, x, y, 300, 333, port, 1);
+			slots[2] = new PortSlotGui(this, x, y, 300, 333, port, 2);
+			back = Bitmap(new Assets.POPUP).bitmapData;
 		}
 		
 		/* INTERFACE net.natpat.gui.IGuiElement */
@@ -49,7 +47,6 @@ package net.natpat.gui
 			slots[0].render();
 			slots[1].render();
 			slots[2].render();
-			exit.render();
 		}
 		
 		public function update():void 
@@ -62,7 +59,6 @@ package net.natpat.gui
 			slots[0].update()
 			slots[1].update()
 			slots[2].update()
-			exit.update();
 		}
 		
 		public function add():void 
@@ -72,7 +68,7 @@ package net.natpat.gui
 		
 		public function remove():void 
 		{
-			
+			GV.onGUI = null;
 		}
 		
 		public function close():void

@@ -1,9 +1,15 @@
 package net.natpat.gui 
 {
 	import flash.accessibility.ISearchableText;
+	import flash.display.Bitmap;
 	import flash.display.BitmapData;
+	import flash.geom.Point;
+	import flash.geom.Rectangle;
+	import net.natpat.Assets;
+	import net.natpat.GC;
 	import net.natpat.GV;
 	import net.natpat.Port;
+	import net.natpat.SpriteSheet;
 	/**
 	 * ...
 	 * @author Nathan Patel
@@ -18,9 +24,9 @@ package net.natpat.gui
 		public var height:int
 		
 		public var buyButton:Button;
+		public var cost:Text;
 		public var back:Button;
 		public var dest:Text;
-		public var gold:Text;
 		
 		public var rerouteButton:Button;
 		
@@ -32,6 +38,11 @@ package net.natpat.gui
 		
 		public var parent:PortGui;
 		
+		public var image:BitmapData;
+		
+		public static var overs:Array = [Bitmap(new Assets.BUTTONS1).bitmapData,
+										 Bitmap(new Assets.BUTTONS2).bitmapData,
+										 Bitmap(new Assets.BUTTONS3).bitmapData]
 		public function PortSlotGui(parent:PortGui, x:int, y:int, width:int, height:int, port:Port, index:int) 
 		{
 			this.parent = parent;
@@ -42,15 +53,23 @@ package net.natpat.gui
 			
 			hasRoute = (port.ships[index] != null)
 			
-			buyButton = new Button(new BitmapData(width, height, true, 0xffcccccc), x, y, width, height, buy, 0, -1, -1, -1, -1, "Buy a ship\n" + GV.shipCost + " gold", 18); 
+			x += 4 * index;
+			
+			buyButton = new Button(new BitmapData(1, 1, true, 0), x+90, y + 60 + index * 80, 135, 55, buy, 0); 
+			cost = new Text(x + 125, y + 63 + index * 80, "" + GV.shipCost, 32, false, 0);
+			image = new BitmapData(width, height, true, 0);
+			image.copyPixels(overs[index], new Rectangle(hasRoute ? 0 : width, 0, width, height), GC.ZERO, null, null, true);
 			
 			if (hasRoute)
 			{
-				back = new Button(new BitmapData(width, height, true, 0xffcccccc), x, y, width, height, nuthin, 0, -1, -1, -1, -1); 
-				dest = new Text(x, y, port.ships[index].route.to.name, 24, false, 0);
-				dest.x = x + (width - dest.width) / 2;
-				gold = new Text(x, y + 30, port.ships[index].route.gold + " gold", 18, false, 0);
-				gold.x = x + (width - gold.width) / 2;
+				var size:int = 29;
+				do {
+					dest = new Text(x, y + 61 + index * 80, port.ships[index].route.to.name, size, false, 0);
+					size--;
+				} while (dest.width > 110);
+				
+				dest.x = x + 90 + (135 - dest.width) / 2;
+				dest.y -= (size - 28) * 0.75;
 			}
 			
 			rerouteButton = new Button(new BitmapData(width - 20, height - 20, true, 0xffff0000), 10, height - 10, width - 20, 20, reroute, 0, -1, -1, -1, -1, "Reroute", 16);
@@ -64,13 +83,14 @@ package net.natpat.gui
 		{
 			if (!hasRoute)
 			{
+				GV.screen.copyPixels(image, image.rect, new Point(x, y));
 				buyButton.render();
+				cost.render();
 			}
 			else
 			{
-				back.render();
+				GV.screen.copyPixels(image, image.rect, new Point(x, y));
 				dest.render();
-				gold.render();
 			}
 		}
 		
@@ -79,12 +99,11 @@ package net.natpat.gui
 			if (!hasRoute)
 			{
 				buyButton.update();
+				cost.update();
 			}
 			else
 			{
-				back.update();
 				dest.update();
-				gold.update();
 			}
 		}
 		

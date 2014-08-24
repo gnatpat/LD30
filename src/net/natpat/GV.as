@@ -31,13 +31,13 @@ package net.natpat
 		
 		public static var zoom:Number = 5;
 		
-		public static var gold:int = 53;
+		public static var gold:int = 9999999;
 		
 		public static var shipCost:int = 50;
 		
 		public static var w:Waypoint;
 		
-		public static const debuggingConnections:Boolean = true;
+		public static const debuggingConnections:Boolean = false;
 		
 		public static function get routeCost():int
 		{

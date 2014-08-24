@@ -49,41 +49,14 @@ package net.natpat
 					}
 				}
 			}
-			removeConnection(72, 122);
-			removeConnection(72, 69);
-			removeConnection(74, 123);
-			removeConnection(72, 123);
-			removeConnection(73, 123);
-			removeConnection(31, 83);
-			removeConnection(32, 83);
-			removeConnection(33, 31);
-			removeConnection(30, 83);
-			removeConnection(86, 30);
-			removeConnection(70, 87);
-			removeConnection(69, 87);
-			removeConnection(33, 70);
-			removeConnection(81, 122);
-			removeConnection(122, 70);
-			removeConnection(68, 123);
-			removeConnection(6, 113);
-			removeConnection(18, 112);
-			removeConnection(16, 112);
-			removeConnection(112, 21);
-			removeConnection(22, 112);
-			removeConnection(28, 112);
-			removeConnection(28, 21);
-			removeConnection(117, 27);
-			removeConnection(29, 115);
-			removeConnection(27, 115);
-			removeConnection(22, 117);
-			removeConnection(27, 26);
-			removeConnection(33, 83);
-			removeConnection(75, 83);
-			removeConnection(81, 79);
-			removeConnection(68, 126);
+			removeConnection(30, 179);
+			removeConnection(31, 179);
+			removeConnection(32, 179);
+			removeConnection(33, 179);
+			removeConnection(75, 179);
 		}
 		
-		public function removeConnection(w1:int, w2:int)
+		public function removeConnection(w1:int, w2:int):void
 		{
 			waypoints[w1].removeConnectionTo(waypoints[w2]);
 			waypoints[w2].removeConnectionTo(waypoints[w1]);
