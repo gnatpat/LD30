@@ -79,8 +79,39 @@ package net.natpat {
 			wm.add(new Port(7784, 2234, "Bayonne"));
 			wm.add(new Port(8405, 1749, "Rotterdam"));
 			wm.add(new Port(7603, 2300, "Santander"));
-			wm.add(new Port(7733, 2697, "Seville")); 
-			
+			wm.add(new Port(7733, 2697, "Gibraltar")); 
+			wm.add(new Port(3762, 1525, "Quebec City"));
+			wm.add(new Port(2673, 2301, "Carabelle"));
+			wm.add(new Port(3214, 1985, "Richmond"));
+			wm.add(new Port(2690, 2788, "Havana"));
+			wm.add(new Port(2367, 3319, "Cartagena"));
+			wm.add(new Port(2751, 3292, "Caracas"));
+			wm.add(new Port(3862, 3677, "Fortaleza"));
+			wm.add(new Port(4004, 4177, "Salvador"));
+			wm.add(new Port(3559, 4921, "Rio de Janeiro"));
+			wm.add(new Port(6118, 1234, "Reykjavik"));
+			wm.add(new Port(3069, 5421, "Buenos Aires"));
+			wm.add(new Port(3218, 5166, "Porto Allegre"));
+			wm.add(new Port(2958, 6065, "Rio Gallegos"));
+			wm.add(new Port(3600, 6064, "Stanley"));
+			wm.add(new Port(3461, 1737, "Boston"));
+			wm.add(new Port(3067, 2938, "San Juan"));
+			wm.add(new Port(7042, 4129, "Dakar"));
+			wm.add(new Port(7177, 4360, "Freetown"));
+			wm.add(new Port(8023, 4399, "Lagos"));
+			wm.add(new Port(8141, 5218, "Port Gentil"));
+			wm.add(new Port(8380, 5717, "Luanda"));
+			wm.add(new Port(8502, 6273, "Cape Town"));
+			wm.add(new Port(8625, 2664, "Naples"));
+			wm.add(new Port(7914, 2929, "Algiers"));
+			wm.add(new Port(8280, 3029, "Tunis"));
+			wm.add(new Port(9615, 3125, "Beirut"));
+			wm.add(new Port(9017, 3231, "Alexandria"));
+			wm.add(new Port(9357, 2842, "Athens"));
+			wm.add(new Port(9422, 2587, "Thessaloniki"));
+			wm.add(new Port(9071, 2428, "Split"));
+			wm.add(new Port(7475, 2980, "Casablanca"));
+			wm.add(new Port(8194, 2419, "Barcelona"));
 			
 			wm.connectWaypoints();
 			
@@ -213,8 +244,6 @@ package net.natpat {
 			}
 			
 			gold.text = "Gold: " + GV.gold;
-			
-			trace(GV.onGUI);
 			
 			Input.update();
 		}
