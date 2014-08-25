@@ -120,15 +120,15 @@ package net.natpat
 				if ((waypoint == route.connections.length - 1 && next == 1)
 				 || (waypoint == 0                            && next == -1))
 				{
-					ss.masterScale = Math.min(scale, (GV.dist(x, y, xDest, yDest)) / 25 * scale);
+					ss.masterScale = Math.min(ss.masterScale, (GV.dist(x, y, xDest, yDest)) / 25 * scale);
 				}
 				if (waypoint == 0 && next == 1)
 				{
-					ss.masterScale = Math.min(scale, (GV.dist(x, y, route.connections[waypoint].from.x, route.connections[waypoint].from.y)) / 25 * scale);
+					ss.masterScale = Math.min(ss.masterScale, (GV.dist(x, y, route.connections[waypoint].from.x, route.connections[waypoint].from.y)) / 25 * scale);
 				}
 				if (waypoint == route.connections.length - 1 && next == -1) 
 				{
-					ss.masterScale = Math.min(scale, (GV.dist(x, y, route.connections[waypoint].to.x, route.connections[waypoint].to.y)) / 25 * scale);
+					ss.masterScale = Math.min(ss.masterScale, (GV.dist(x, y, route.connections[waypoint].to.x, route.connections[waypoint].to.y)) / 25 * scale);
 				}
 				
 			}
@@ -164,7 +164,8 @@ package net.natpat
 			
 			waypoint += next;
 			
-			if (cc.from.hasPirate)
+			if ((next == 1 && cc.from.hasPirate)
+			 || (next == -1 && cc.to.hasPirate))
 			{
 				pirate();
 			}

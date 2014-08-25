@@ -82,6 +82,10 @@ package net.natpat {
 		
 		public var currentMusic:int = 3;
 		
+		public var time:Number;
+		
+		public var timeText:Text;
+		
 		public function GameManager(stageWidth:int, stageHeight:int) 
 		{
 			
@@ -421,6 +425,10 @@ package net.natpat {
 			GuiManager.add(gold);
 			gold.y = GC.SCREEN_HEIGHT - gold.height;
 			
+			timeText = new Text(10, GC.SCREEN_HEIGHT - 50, "Week 1, Year 1", 25, false, 0);
+			GuiManager.add(timeText);
+			timeText.y = GC.SCREEN_HEIGHT - timeText.height;
+			
 			costText = new Text(-100, -100, "0", 14);
 			GuiManager.add(costText);
 			distanceText = new Text(-100, -100, "0", 14);
@@ -451,6 +459,8 @@ package net.natpat {
 			musics[currentMusic].play();
 			
 			Sfx.addSfxs();
+			
+			time = 0;
 		}
 		
 		public function helpUp():void
@@ -712,6 +722,9 @@ package net.natpat {
 			
 			gold.x = GC.SCREEN_WIDTH - gold.width - 10;
 			
+			time += GV.elapsed;
+			var weeks:int = int(time);
+			timeText.text = "Year " + (int(weeks / 52) + 1) + ", Week " + ((weeks % 52) + 1);
 			//trace(GV.mouseX, GV.mouseY);
 			
 			Input.update();

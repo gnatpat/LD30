@@ -59,6 +59,11 @@ package net.natpat
 			masterScale = scale;
 		}
 		
+		public function get currentAnim():String
+		{
+			return anim.name;
+		}
+		
 		/**
 		 * Create a new animation.
 		 * @param	name	Name of new animation

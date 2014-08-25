@@ -36,7 +36,7 @@ package net.natpat
 			pirateSS = new SpriteSheet(Assets.PIRATES, 128, 144, 0.5);
 			pirateSS.addAnim("fire", [[0, 0, 0.2], [1, 0, 0.4], [2, 0, 0.2], [3, 0, 0.2], [4, 0, 0.2], [5, 0, 0.4], [6, 0, 0.2], [7, 0, 0.2], [8, 0, 0.2, explode], [8, 0, 5]], true);
 			pirateSS.addAnim("explode", [[0, 1, 0.2], [1, 1, 0.2], [2, 1, 0.2], [3, 1, 0.2, remove]], true);
-			pirateSS.changeAnim("fire");
+			pirateSS.changeAnim("default");
 		}
 		
 		override public function gotToDest():void 
@@ -77,7 +77,14 @@ package net.natpat
 		override public function pirate():void 
 		{
 			trace("PRIATES");
-			cc.to.clearPirate();
+			if (next == 1)
+			{
+				cc.from.clearPirate();
+			}
+			else
+			{
+				cc.to.clearPirate();
+			}
 			move = false;
 			if (!pirates)
 			{
