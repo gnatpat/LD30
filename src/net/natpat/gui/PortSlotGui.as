@@ -46,6 +46,8 @@ package net.natpat.gui
 										 
 		public var size:int;
 		
+		public var shipCost:int
+		
 		public function PortSlotGui(parent:PortGui, x:int, y:int, width:int, height:int, port:Port, index:int) 
 		{
 			this.parent = parent;
@@ -58,8 +60,10 @@ package net.natpat.gui
 			
 			x += 4 * index;
 			
+			shipCost = GV.shipCosts[index];
+			
 			buyButton = new Button(new BitmapData(1, 1, true, 0), x+90, y + 60 + index * 80, 135, 55, buy, 0); 
-			cost = new Text(x + 125, y + 63 + index * 80, "" + GV.shipCost, 32, false, 0);
+			cost = new Text(x + 125, y + 63 + index * 80, "" + shipCost, 32, false, 0);
 			image = new BitmapData(width, height, true, 0);
 			image.copyPixels(overs[index], new Rectangle(hasRoute ? 0 : width, 0, width, height), GC.ZERO, null, null, true);
 			
@@ -143,6 +147,7 @@ package net.natpat.gui
 		
 		public function buy():void
 		{
+			GV.shipCost = shipCost;
 			port.startRoute(index);
 			parent.close();
 		}

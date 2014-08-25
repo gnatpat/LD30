@@ -18,11 +18,16 @@ package net.natpat
 		public var from:Port;
 		public var to:Port;
 		
-		public function Route(connections:Vector.<WaypointConnection>, graphic:Shape) 
+		public var distance:int;
+		
+		public function Route(connections:Vector.<WaypointConnection>, graphic:Shape, distance:int) 
 		{
 			this.connections = connections;
 			this.lineGraphic = graphic;
-			gold = 10;
+			this.distance = distance;
+			
+			
+			gold = 5 + 0.01 * distance;
 			if (connections[0].from is Port)
 				from = Port(connections[0].from);
 			else from = null

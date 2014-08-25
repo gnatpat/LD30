@@ -55,11 +55,13 @@ package net.natpat
 			GV.zoom = Math.min(5, GV.zoom);
 		}
 		
-		public static var gold:int = 100;
+		public static var gold:int = 40;
 		
 		public static var shipCost:int = 50;
-		public static var redShipCost:int = 70;
-		public static var goldShipCost:int = 30;
+		public static var redShipCost:int = 20;
+		public static var goldShipCost:int = 20;
+		
+		public static var shipCosts:Array = [10, 50, 150];
 		
 		public static var w:Waypoint;
 		
