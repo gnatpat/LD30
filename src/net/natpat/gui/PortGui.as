@@ -4,6 +4,7 @@ package net.natpat.gui
 	import flash.display.BitmapData;
 	import flash.geom.Point;
 	import net.natpat.Assets;
+	import net.natpat.GC;
 	import net.natpat.GV;
 	import net.natpat.Input;
 	import net.natpat.Port;
@@ -131,8 +132,15 @@ package net.natpat.gui
 		
 		public function buyRed():void
 		{
-			port.startRoute( -1);
-			GV.redShip = new RedShip(port, null, 50);
+			if (GV.redShipNo < GC.MAX_RED_SHIPS)
+			{
+				port.startRoute( -1);
+				GV.redShip = new RedShip(port, null, 50);
+			}
+			else
+			{
+				GuiManager.add(new DialogOk(null, "You can't have more than\n" + GC.MAX_RED_SHIPS + " privateers!", 18));
+			}
 			this.close();
 		}
 	}

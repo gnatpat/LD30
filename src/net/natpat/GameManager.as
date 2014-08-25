@@ -11,9 +11,12 @@ package net.natpat {
 	import net.natpat.gui.Button;
 	import net.natpat.gui.Dialog;
 	import net.natpat.gui.DialogOk;
-	import net.natpat.gui.GoldShip;
+	import net.natpat.GoldShip;
+	import net.natpat.gui.GoldMinus;
+	import net.natpat.gui.Help;
 	import net.natpat.gui.InputBox;
 	import net.natpat.gui.PortGui;
+	import net.natpat.gui.Upgrades;
 	import net.natpat.particles.Emitter;
 	import net.natpat.utils.Sfx;
 	
@@ -58,16 +61,26 @@ package net.natpat {
 		public var routeStarted:Boolean = false;
 		
 		public var costText:Text;
+		public var distanceText:Text;
 		
 		public var dialogUp:Boolean = false;
 		
-		public var lineColour:uint = 0x44b1f0;
+		public var lineColour:uint = 0x34a1e0;
 		
 		public var UIImage:BitmapData;
+		public var upgrades:Upgrades;
 		
 		public var clickAndDrag:BitmapData = Bitmap(new Assets.CAD).bitmapData
 		public var cady:int;
 		public var cadx:int;
+		
+		public var helpButton:Button;
+		
+		public var gad:BitmapData;
+		
+		public var musics:Vector.<Sfx>
+		
+		public var currentMusic:int = 3;
 		
 		public function GameManager(stageWidth:int, stageHeight:int) 
 		{
@@ -408,14 +421,41 @@ package net.natpat {
 			GuiManager.add(gold);
 			gold.y = GC.SCREEN_HEIGHT - gold.height;
 			
-			costText = new Text(-100, -100, "0", 16);
+			costText = new Text(-100, -100, "0", 14);
 			GuiManager.add(costText);
+			distanceText = new Text(-100, -100, "0", 14);
+			GuiManager.add(distanceText);
 			
 			
 			UIImage = Bitmap(new Assets.UI).bitmapData;
+			upgrades = new Upgrades();
+			GuiManager.add(new Upgrades);
 			
 			cady = clickAndDrag.height * -1;
-			cadx = (GC.SCREEN_WIDTH - clickAndDrag.width)/2
+			cadx = (GC.SCREEN_WIDTH - clickAndDrag.width) / 2
+			
+			helpButton = new Button(Bitmap(new Assets.HELPBUTTON).bitmapData, GC.SCREEN_WIDTH - 60, 10, 50, 50, helpUp, 0 );
+			GuiManager.add(helpButton);
+			
+			GuiManager.add(new Help);
+			
+			gad = Bitmap(new Assets.ROUTE_DATA).bitmapData;
+			
+			musics = new Vector.<Sfx>(4);
+			
+			musics[0] = new Sfx(Assets.MUSIC1, false, playSoundtrack);
+			musics[1] = new Sfx(Assets.MUSIC2, false, playSoundtrack);
+			musics[2] = new Sfx(Assets.MUSIC3, false, playSoundtrack);
+			musics[3] = new Sfx(Assets.MUSIC4, false, playSoundtrack);
+			
+			musics[currentMusic].play();
+			
+			Sfx.addSfxs();
+		}
+		
+		public function helpUp():void
+		{
+			GuiManager.add(new Help);
 		}
 		
 		public function render():void
@@ -457,6 +497,11 @@ package net.natpat {
 			renderer.draw(mapBD, m);
 			renderer.draw(scaleBD, m);
 			renderer.draw(objBD);
+			
+			if (GV.makingRoute && Input.mouseDown)
+			{
+				renderer.copyPixels(gad, gad.rect, new Point(Input.mouseX - 45, Input.mouseY - 95)); 
+			}
 			
 			renderer.copyPixels(UIImage, UIImage.rect, new Point(0, GC.SCREEN_HEIGHT - UIImage.height));
 			
@@ -505,32 +550,43 @@ package net.natpat {
 					mouseLine.graphics.moveTo(Waypoint.selected.x, Waypoint.selected.y);
 					mouseLine.graphics.lineTo(GV.mouseX, GV.mouseY);
 					var length:int = Math.sqrt((Waypoint.selected.x - GV.mouseX) * (Waypoint.selected.x - GV.mouseX)
-					                         + (Waypoint.selected.y - GV.mouseY) * (Waypoint.selected.y - GV.mouseY)) / GC.DIST_TO_COST_RATIO;
-					var cost:int = GV.routeCost + length * ((GV.redShip == null) ? 1 : 0);
+					                         + (Waypoint.selected.y - GV.mouseY) * (Waypoint.selected.y - GV.mouseY));
+					var cost:int = GV.routeCost + length  / GC.DIST_TO_COST_RATIO * ((GV.redShip == null) ? 1 : 0);
 					if (cost > GV.gold)
 					{
 						costText.colour = 0xff0000;
 					}
 					else
 					{
-						costText.colour = 0xffffff;
+						costText.colour = 0;
+					}
+					var totalLength:int = GV.routeDistance + length;
+					if (totalLength > GV.maxDistance)
+					{
+						distanceText.colour = 0xff0000;
+					}
+					else
+					{
+						distanceText.colour = 0;
 					}
 					costText.text = "" + cost;
-					costText.x = Input.mouseX;
-					costText.y = Input.mouseY - 30;
+					distanceText.text = "" + totalLength;
+					costText.x = Input.mouseX - 3;
+					costText.y = Input.mouseY - 77;
+					distanceText.x = Input.mouseX - 3;
+					distanceText.y = Input.mouseY - 62;
 				}
 				if (Input.mouseReleased)
 				{
-					if (routeStarted)
+					//if (routeStarted)
 					{
 						if (GV.redShip == null)
 						{
 							GV.makingRoute = false;
-							Waypoint.selected = null;
-							GV.currentRoute = new Vector.<WaypointConnection>();
-							pathGraphic = new Shape();
-							costText.x = -100;
-							costText.y = -100;
+							if (!(Waypoint.selected is Port))
+							{
+								clearRoute();
+							}
 						}
 						else
 						{
@@ -543,16 +599,14 @@ package net.natpat {
 			else
 			{
 				cady -= 150 * GV.elapsed;
-				cady = Math.max(-clickAndDrag.height, cady);
+				cady = Math.max( -clickAndDrag.height, cady);
 				if (GV.currentRoute.length != 0 && !dialogUp)
 				{
-					oldLength = oldLength - (GV.redShip == null? 0 : 1);
-					drawLine(GV.currentRoute[oldLength]);
-					GV.routeDistance+= GV.currentRoute[oldLength].distance;
+					oldLength = oldLength - 1;
 					
 					dialogUp = true;
 					
-					if (GV.routeCost <= GV.gold)
+					if (GV.routeCost <= GV.gold && GV.routeDistance <= GV.maxDistance)
 					{
 						if (GV.routeForReplace)
 						{
@@ -571,9 +625,17 @@ package net.natpat {
 							if (GV.redShipAdded)
 							{
 								addRedShip();
+								if (Waypoint.selected is Port)
+								{
+									GuiManager.add(new DialogOk(null, "Privateers can't go\ninto ports!", 18));
+								}
 							}
 							else
 							{
+								if (Waypoint.selected is Port)
+								{
+									GV.currentRoute.pop();
+								}
 								GuiManager.add(new Dialog(addRedShip, clearRoute , "Send out a privateer into the ocean?\n" +
 																		" It will cost " + GV.routeCost + " gold.", 16));
 							}
@@ -586,24 +648,27 @@ package net.natpat {
 					}
 					else
 					{
+						var tooFar:Boolean = GV.routeDistance > GV.maxDistance;
+						var error:String = (tooFar? "It's too far away!" : "You don't have the gold!")
 						if (GV.goldShip)
 						{
 							GuiManager.add(new DialogOk(clearRoute , "You can't send an explorer to " + Port(GV.currentRoute[oldLength].to).name +
-																			"!\nYou don't have the gold!", 16));
+																			"!\n" + error, 16));
 						}
 						else if (GV.redShip != null)
 						{
 							GuiManager.add(new DialogOk(clearRoute , "You can't send out a privateer!" +
-																			"\nYou don't have the gold!", 16));
+																			"\n" + error, 16));
 						}
 						else
 						{
 							GuiManager.add(new DialogOk(clearRoute , "You can't make a trade route from\n" + GV.routePort.name + " to " + Port(GV.currentRoute[oldLength].to).name +
-																			"!\nYou don't have the gold!", 16));
+																			"!\n" + error, 16));
 						}
 					}
 					
 				}
+				
 				mouseLine.graphics.clear();
 				routeStarted = false;
 			}
@@ -654,7 +719,7 @@ package net.natpat {
 		
 		public function addShip():void
 		{
-			GV.spendGold(GV.routeCost, Input.mouseX, Input.mouseY);
+			GV.spendGold(GV.routeCost, GV.mouseX, GV.mouseY);
 			var s:Ship = GV.goldShip ? new GoldShip(new Route(GV.currentRoute, pathGraphic, GV.routeDistance), GV.goldShipCost) :  new Ship(new Route(GV.currentRoute, pathGraphic, GV.routeDistance));
 			sm.addShip(s, GV.routePort, GV.routeIndex);
 			clearRoute();
@@ -670,14 +735,13 @@ package net.natpat {
 		
 		public function drawLine(wc:WaypointConnection):void
 		{
-			pathGraphic.graphics.lineStyle(15, lineColour, 1);
+			pathGraphic.graphics.lineStyle(15, lineColour, 0.5);
 			pathGraphic.graphics.moveTo(wc.from.x, wc.from.y);
 			pathGraphic.graphics.lineTo(wc.to.x, wc.to.y);
 		}
 		
 		public function clearRoute():void
 		{
-			
 			GV.routeForReplace = false;
 			dialogUp = false;
 			pathGraphic = new Shape();
@@ -686,6 +750,8 @@ package net.natpat {
 			
 			costText.x = -100;
 			costText.y = -100;
+			distanceText.x = -100;
+			distanceText.y = -100;
 			
 			GV.goldShip = false;
 			GV.redShip = null;
@@ -697,16 +763,28 @@ package net.natpat {
 		{
 			if (GV.currentRoute.length != 0)
 			{
-				GV.redShip.route = new Route(GV.currentRoute, new Shape(), 0);
+				GV.spendGold(GV.routeCost, GV.mouseX, GV.mouseY);
+				GV.redShip.route = new Route(GV.currentRoute, new Shape(), GV.routeDistance);
 				if (GV.redShip.sm == null)
 				{
 					sm.addShip(GV.redShip, null, -1);
 					GV.redShip.sm = sm;
+					GV.redShipNo++;
 				}
 				GV.redShip.started();
 			}
 			GV.redShip = null;
 			clearRoute();
+		}
+	
+		public function playSoundtrack():void
+		{
+			var next:int;
+			do {
+				next = GV.rand(4);
+			} while (next == currentMusic);
+			musics[next].play();
+			currentMusic = next;
 		}
 	}
 

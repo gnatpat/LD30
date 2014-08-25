@@ -7,6 +7,7 @@ package net.natpat.gui
 	import net.natpat.GC;
 	import net.natpat.GV;
 	import net.natpat.Input;
+	import net.natpat.utils.Sfx;
 	/**
 	 * ...
 	 * @author Nathan Patel
@@ -38,6 +39,7 @@ package net.natpat.gui
 			this.text.x = (GC.SCREEN_WIDTH - this.text.width) / 2
 			okay = new Button(new BitmapData(1, 1, true, 0), x + 260, y + 205, 90, 50, okclick);
 			this.ok = ok;
+			Sfx.sfxs["error"].play();
 		}
 		
 		/* INTERFACE net.natpat.gui.IGuiElement */

@@ -6,9 +6,11 @@ package net.natpat
 	import flash.display.BitmapData;
 	import flash.display.Bitmap;
 	import net.natpat.gui.Button;
+	import net.natpat.gui.GoldMinus;
 	import net.natpat.gui.GoldPlus;
 	import net.natpat.gui.GuiManager;
 	import net.natpat.gui.IGuiElement;
+	import net.natpat.utils.Sfx;
 	import net.natpat.utils.WaypointConnection;
 	
 	/**
@@ -17,6 +19,8 @@ package net.natpat
 	 */
 	public class GV 
 	{
+		
+		public static var maxDistance:int = 400;
 		
 		public static var onGUI:IGuiElement = null;
 		
@@ -37,6 +41,9 @@ package net.natpat
 		public static var zoom:Number = 5;
 		
 		public static var goldShip:Boolean = false;
+		
+		
+		public static var redShipNo:int = 0;
 		
 		public static function get redShipAdded():Boolean
 		{
@@ -90,12 +97,15 @@ package net.natpat
 		public static function spendGold(gold:int, x:int, y:int):void
 		{
 			GV.gold -= gold;
+			GuiManager.add(new GoldMinus(x, y, gold));
+			Sfx.sfxs["moneyOut"].play();
 		}
 		
 		public static function makeGold(gold:int, x:int, y:int):void
 		{
 			GV.gold += gold;
 			GuiManager.add(new GoldPlus(x, y, gold));
+			Sfx.sfxs["moneyIn"].play();
 		}
 		
 		public static function getScreenX(x:int):int

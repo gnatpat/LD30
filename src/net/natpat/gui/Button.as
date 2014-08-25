@@ -156,6 +156,7 @@ package net.natpat.gui
 				else if (Input.mouseReleased)
 				{
 					clipRectangle = releasedRect;
+					Input.mouseReleased = false;
 					releasedFunction();
 				}
 				else
