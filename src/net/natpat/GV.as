@@ -22,6 +22,12 @@ package net.natpat
 		
 		public static var maxDistance:int = 400;
 		
+		public static var normalDistanceGoldMult:Number = 1;
+				
+		public static var redDistanceGoldMult:Number = 1;
+	
+		public static var goldDistanceGoldMult:Number = 2;
+		
 		public static var onGUI:IGuiElement = null;
 		
 		public static var makingRoute:Boolean = false;
@@ -62,12 +68,17 @@ package net.natpat
 			GV.zoom = Math.min(5, GV.zoom);
 		}
 		
-		public static var gold:int = 40;
+		public static function get distanceGoldMult():Number
+		{
+			return GV.goldShip ? goldDistanceGoldMult : (GV.redShip != null ? redDistanceGoldMult : normalDistanceGoldMult);
+		}
+		
+		public static var gold:int = 4000;
 		
 		public static var shipCost:int = 50;
 		public static var redShipCost:int = 20;
 		public static var goldShipCost:int = 20;
-		
+		public static var goldMult :Number = 0.01;
 		public static var shipCosts:Array = [10, 50, 150];
 		
 		public static var w:Waypoint;
@@ -76,7 +87,7 @@ package net.natpat
 		
 		public static function get routeCost():int
 		{
-			return GV.redShipAdded  ? 0 : int(routeDistance / GC.DIST_TO_COST_RATIO) + (routeForReplace ? 0 : (GV.redShip != null? redShipCost : (GV.goldShip ? goldShipCost : shipCost)));
+			return GV.redShipAdded  ? 0 : int(routeDistance / GC.distToCostRatio) * distanceGoldMult + (routeForReplace ? 0 : (GV.redShip != null? redShipCost : (GV.goldShip ? goldShipCost : shipCost)));
 		}
 		
 		public static function get mouseX():int

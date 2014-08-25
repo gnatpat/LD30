@@ -551,7 +551,7 @@ package net.natpat {
 					mouseLine.graphics.lineTo(GV.mouseX, GV.mouseY);
 					var length:int = Math.sqrt((Waypoint.selected.x - GV.mouseX) * (Waypoint.selected.x - GV.mouseX)
 					                         + (Waypoint.selected.y - GV.mouseY) * (Waypoint.selected.y - GV.mouseY));
-					var cost:int = GV.routeCost + length  / GC.DIST_TO_COST_RATIO * ((GV.redShip == null) ? 1 : 0);
+					var cost:int = GV.routeCost + length  * GV.distanceGoldMult / GC.distToCostRatio * ((GV.redShip == null) ? 1 : 0);
 					if (cost > GV.gold)
 					{
 						costText.colour = 0xff0000;

@@ -22,7 +22,7 @@ package net.natpat
 		
 		public static const MAX_ZOOM:Number = 5.5;
 		
-		public static const DIST_TO_COST_RATIO:int = 50;
+		public static var distToCostRatio:int = 50;
 		
 		public static const SCROLL_BORDER:int = 60;
 		

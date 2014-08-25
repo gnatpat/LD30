@@ -7,6 +7,7 @@ package net.natpat.gui
 	import net.natpat.GC;
 	import net.natpat.GV;
 	import net.natpat.Input;
+	import net.natpat.Ship;
 	import net.natpat.utils.Ease;
 	/**
 	 * ...
@@ -34,10 +35,14 @@ package net.natpat.gui
 		public var cost3Text:Text;
 		public var cost4Text:Text;
 		
-		public var cost1:int = 100;
-		public var cost2:int = 100;
-		public var cost3:int = 100;
-		public var cost4:int = 100;
+		public var cost1:int = 200;
+		public var cost2:int = 200;
+		public var cost3:int = 200;
+		public var cost4:int = 200;
+		public var level1:int = 0;
+		public var level2:int = 0;
+		public var level3:int = 0;
+		public var level4:int = 0;
 		
 		public var costOffsetX:int = 120;
 		public var costOffsetY:int = 80;
@@ -132,8 +137,11 @@ package net.natpat.gui
 				GV.spendGold(cost1, Input.mouseX, Input.mouseY);
 				
 				//DO UPGRADE 1 HERE
+				GV.maxDistance+= 400;
 				//UPDATE COST 1 HERE
+				cost1 *= 1.5;
 				
+				level1++;
 				cost1Text.text = "" + cost1;
 			}
 		}
@@ -146,7 +154,10 @@ package net.natpat.gui
 				
 				//DO UPGRADE 2 HERE
 				//UPDATE COST 2 HERE
+				Ship.speed += 60;
+				cost2 *= 1.5;
 				
+				level2++
 				cost2Text.text = "" + cost2;
 			}
 			
@@ -160,7 +171,9 @@ package net.natpat.gui
 				
 				//DO UPGRADE 3 HERE
 				//UPDATE COST 3 HERE
-				
+				GV.goldMult*=2;
+				cost3 *= 1.5;
+				level3++
 				cost3Text.text = "" + cost3;
 			}
 			
@@ -174,7 +187,9 @@ package net.natpat.gui
 				
 				//DO UPGRADE 4 HERE
 				//UPDATE COST 4 HERE
-				
+				GC.distToCostRatio *= 1.25;
+				cost4 *= 1.5;
+				level4++;
 				cost4Text.text = "" + cost4;
 				
 			}

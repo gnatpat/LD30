@@ -23,7 +23,7 @@ package net.natpat
 		public var xDest:int;
 		public var yDest:int;
 		
-		public var speed:Number = 60;
+		public static var speed:Number = 60;
 		
 		public var dir:Point;
 		public var waypoint:int;

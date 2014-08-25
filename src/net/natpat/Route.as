@@ -27,7 +27,7 @@ package net.natpat
 			this.distance = distance;
 			
 			
-			gold = 5 + 0.01 * distance;
+			gold = 5 + GV.goldMult * distance;
 			if (connections[0].from is Port)
 				from = Port(connections[0].from);
 			else from = null
