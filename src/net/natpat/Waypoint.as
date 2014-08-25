@@ -273,6 +273,7 @@ package net.natpat
 		public function clearPirate():void
 		{
 			hasPirate = false;
+			trace(hasPirate);
 		}
 		
 		public function pirateKill():void
