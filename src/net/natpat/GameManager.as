@@ -621,7 +621,7 @@ package net.natpat {
 						if (GV.routeForReplace)
 						{
 							GuiManager.add(new Dialog(addReplaceShip, clearRoute, "Are you sure you want to change the ship's\ndestination from " +
-																				  GV.routePort.ships[GV.routeIndex].route.to.name + " to " + Port(GV.currentRoute[oldLength].to).name 
+ 																				  GV.routePort.ships[GV.routeIndex].route.to.name + " to " + Port(GV.currentRoute[oldLength].to).name 
 																				  + " when it next returns?\n" +
 																				  "It will cost " + GV.routeCost + " gold.", 16));
 						}
@@ -733,7 +733,7 @@ package net.natpat {
 		public function addShip():void
 		{
 			GV.spendGold(GV.routeCost, GV.mouseX, GV.mouseY);
-			var s:Ship = GV.goldShip ? new GoldShip(new Route(GV.currentRoute, pathGraphic), GV.goldShipCost) :  new Ship(new Route(GV.currentRoute, pathGraphic));
+			var s:Ship = GV.goldShip ? new GoldShip(new Route(GV.currentRoute, pathGraphic, GV.routeDistance), GV.goldShipCost) :  new Ship(new Route(GV.currentRoute, pathGraphic, GV.routeDistance));
 			sm.addShip(s, GV.routePort, GV.routeIndex);
 			clearRoute();
 		}
@@ -741,7 +741,7 @@ package net.natpat {
 		public function addReplaceShip():void
 		{
 			GV.spendGold(GV.routeCost, Input.mouseX, Input.mouseY);
-			var s:Ship = new Ship(new Route(GV.currentRoute, pathGraphic));
+			var s:Ship = new Ship(new Route(GV.currentRoute, pathGraphic, GV.routeDistance));
 			GV.routePort.newShips[GV.routeIndex] = s;
 			clearRoute();
 		}
@@ -768,6 +768,8 @@ package net.natpat {
 			
 			GV.goldShip = false;
 			GV.redShip = null;
+			GV.routeDistance = 0;
+			
 		}
 		
 		public function addRedShip():void
@@ -775,7 +777,7 @@ package net.natpat {
 			if (GV.currentRoute.length != 0)
 			{
 				GV.spendGold(GV.routeCost, GV.mouseX, GV.mouseY);
-				GV.redShip.route = new Route(GV.currentRoute, new Shape());
+				GV.redShip.route = new Route(GV.currentRoute, new Shape(), GV.routeDistance);
 				if (GV.redShip.sm == null)
 				{
 					sm.addShip(GV.redShip, null, -1);
