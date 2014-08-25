@@ -3,6 +3,7 @@ package net.natpat
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.filters.GlowFilter;
+	import flash.geom.ColorTransform;
 	import flash.geom.Matrix;
 	import flash.geom.Rectangle;
 	import net.natpat.gui.Dialog;
@@ -37,6 +38,7 @@ package net.natpat
 		public var foundColour:String = "yellow";
 		public var unknownColour:String = "grey";
 		
+		
 		public function Port(x:int, y:int, name:String) 
 		{
 			this.name = name;
@@ -47,6 +49,7 @@ package net.natpat
 			
 			ss.filterAnim("greyover", new GlowFilter(0xcccc00, 1, 32, 32, 2 ), 1.3);
 			ss.filterAnim("greysel", new GlowFilter(0x0000cc, 1, 32, 32, 2), 1.3);
+			ss.filterAnim("greyvis", new GlowFilter(0xcc00cc, 1, 32, 32, 2), 1.3);
 			
 			ss.filterAnim("greenover", new GlowFilter(0xcccc00, 1, 32, 32, 2 ), 1.3);
 			ss.filterAnim("greensel", new GlowFilter(0x0000cc, 1, 32, 32, 2), 1.3);
@@ -56,6 +59,7 @@ package net.natpat
 			
 			ss.filterAnim("redover", new GlowFilter(0xcccc00, 1, 32, 32, 2 ), 1.3);
 			ss.filterAnim("redsel", new GlowFilter(0x0000cc, 1, 32, 32, 2), 1.3);
+			ss.filterAnim("redvis", new GlowFilter(0xcc00cc, 1, 32, 32, 2), 1.3);
 			
 			ss.filterAnim("blueover", new GlowFilter(0xcccc00, 1, 32, 32, 2 ), 1.3);
 			ss.filterAnim("bluesel", new GlowFilter(0x0000cc, 1, 32, 32, 2), 1.3);
@@ -68,10 +72,12 @@ package net.natpat
 			
 			ss.filterAnim("yellowover", new GlowFilter(0xcccc00, 1, 32, 32, 2 ), 1.3);
 			ss.filterAnim("yellowsel", new GlowFilter(0x0000cc, 1, 32, 32, 2), 1.3);
+			ss.filterAnim("yellowvis", new GlowFilter(0xcc00cc, 1, 32, 32, 2), 1.3);
 			
 			
-			var textObj:Text =  new Text(0, 0, "", 24, false);
+			var textObj:Text =  new Text(0, 0, name, 24, false);
 			var buffer:BitmapData = new BitmapData(textObj.width, textObj.height, true, 0)
+			buffer.colorTransform(buffer.rect, new ColorTransform(1, 1, 1, 1, 0, 0, 0, -100));
 			textObj.renderOnBuffer(buffer);
 			text = new SpriteSheet(buffer, textObj.width, textObj.height);
 			
@@ -82,6 +88,7 @@ package net.natpat
 			beenTo = home;
 			if (home)
 			{
+				homePort = this;
 				colour = homeColour;
 			}
 		}
@@ -95,27 +102,7 @@ package net.natpat
 			}
 			if (GV.makingRoute)
 			{
-				if (GV.redShip == null)
-				{
-					connectPath();
-				}
-				
-				if (GV.currentRoute.length != 0 && selected == this)
-				{
-					if (GV.redShip != null)
-					{
-						Input.mouseReleased = true;
-						if(GV.redShipAdded)
-							GuiManager.add(new DialogOk(null, "Privateers can't go\ninto ports!", 18));
-						
-					}
-					else
-					{
-						selected = null;
-						GV.makingRoute = false;
-						Input.mouseDown = false;
-					}
-				}
+				super.clicked();
 			}
 			else
 			{
@@ -157,7 +144,11 @@ package net.natpat
 				c.render();
 			}
 			text.render(buffer, x, y - 40 - 7 * (GV.zoom - 1), true, GC.SPRITE_ZOOM_RATIO * 2, true);
-			ss.render(buffer, x, y);
+			if (visible)
+			{
+				ss.changeAnim(colour + "vis");
+			}
+			super.render(buffer);
 			var m:Matrix = new Matrix;
 			if (guiPort == this && gui != null)
 			{
@@ -181,7 +172,6 @@ package net.natpat
 		{
 			ships[index] = null;
 		}
-		
 		
 		override public function startRoute(index:int):void 
 		{

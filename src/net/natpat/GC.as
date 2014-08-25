@@ -27,6 +27,8 @@ package net.natpat
 		public static const SCROLL_BORDER:int = 60;
 		
 		public static const PIRATE_CHANCE:Number = 1 / 60000;
+		
+		public static const MAX_RED_SHIPS:int = 3;
 	}
 
 }

@@ -1,6 +1,7 @@
 package net.natpat 
 {
 	import flash.display.BitmapData;
+	import flash.filters.ColorMatrixFilter;
 	import flash.filters.GlowFilter;
 	import flash.geom.Rectangle;
 	import flash.sampler.NewObjectSample;
@@ -20,7 +21,7 @@ package net.natpat
 		
 		public var connections:Vector.<WaypointConnection>
 		
-		public var greenb:Boolean = false;
+		public var visible:Boolean = false;
 		
 		public var wm:WaypointManager;
 		
@@ -36,6 +37,10 @@ package net.natpat
 		
 		public var redShip:RedShip = null;
 		
+		public var onRoute:Boolean = false;
+		
+		public static var homePort:Port;
+		
 		public function Waypoint(x:int, y:int) 
 		{
 			this.x = x;
@@ -47,6 +52,7 @@ package net.natpat
 			ss.addAnim("red", [[0, 0, 0.1]], true);
 			ss.addAnim("redover", [[0, 0, 0.1]], true);
 			ss.addAnim("redsel", [[0, 0, 0.1]], true);
+			ss.addAnim("redvis", [[0, 0, 0.1]], true);
 			ss.addAnim("blue", [[1, 0, 0.1]], true);
 			ss.addAnim("blueover", [[1, 0, 0.1]], true);
 			ss.addAnim("bluesel", [[1, 0, 0.1]], true);
@@ -56,6 +62,7 @@ package net.natpat
 			ss.addAnim("grey", [[3, 0, 0.1]], true);
 			ss.addAnim("greyover", [[3, 0, 0.1]], true);
 			ss.addAnim("greysel", [[3, 0, 0.1]], true);
+			ss.addAnim("greyvis", [[3, 0, 0.1]], true);
 			ss.addAnim("orange", [[4, 0, 0.1]], true);
 			ss.addAnim("orangeover", [[4, 0, 0.1]], true);
 			ss.addAnim("orangesel", [[4, 0, 0.1]], true);
@@ -68,12 +75,14 @@ package net.natpat
 			ss.addAnim("yellow", [[7, 0, 0.1]], true);
 			ss.addAnim("yellowover", [[7, 0, 0.1]], true);
 			ss.addAnim("yellowsel", [[7, 0, 0.1]], true);
-			ss.addAnim("sea", [[8, 0, 0.1]], true);
+			ss.addAnim("yellowvis", [[7, 0, 0.1]], true);
+			ss.addAnim("sea", [[9, 0, 0.1]], true);
 			ss.addAnim("seaover", [[8, 0, 0.1]], true);
 			ss.addAnim("seasel", [[8, 0, 0.1]], true);
+			ss.addAnim("seavis", [[8, 0, 0.1]], true);
 			ss.filterAnim("seaover", new GlowFilter(0xcccc00, 1, 32, 32, 2 ), 1.3);
 			ss.filterAnim("seasel", new GlowFilter(0x0000cc, 1, 32, 32, 2), 1.3);
-			
+														  
 			colour = "sea";
 			
 			ss.changeAnim(colour);
@@ -89,7 +98,7 @@ package net.natpat
 			if (GV.pointInRect(GV.mouseX, GV.mouseY, x-ss.getWidth()/2, y - ss.getHeight()/2, ss.getWidth(), ss.getHeight()))
 			{
 				mouseOver = this;
-				greenNeighbours();
+				showNeighbours();
 				
 				if (Input.mouseDown && GV.canClick)
 				{
@@ -102,16 +111,18 @@ package net.natpat
 			}
 			
 			var chance:Number =  Math.random();
-			if (chance < GC.PIRATE_CHANCE)
+			if (!(this is Port) && GV.dist(x, y, homePort.x, homePort.y) < GC.MAX_CONNECTION_LENGTH && chance < GC.PIRATE_CHANCE)
 			{
 				this.hasPirate = true;
-				trace("Pirate at " + x + ", " + y);
+				//trace("Pirate at " + x + ", " + y);
 			}
 			
-			if (selected == this && !greenb)
+			if (selected == this)
 			{
-				greenNeighbours();
+				showNeighbours();
 			}
+			
+			
 			
 			if (mouseOver == this)
 			{
@@ -128,11 +139,11 @@ package net.natpat
 			ss.update();
 		}
 		
-		public function greenNeighbours():void
+		public function showNeighbours():void
 		{
 			for each(var c:WaypointConnection in connections)
 			{
-				c.to.green();
+				c.to.makeVisible();
 			}
 		}
 		
@@ -163,7 +174,9 @@ package net.natpat
 				GV.w = null;
 				return;
 			}
+			
 			if (selected != null && GV.makingRoute) connectPath();
+			
 			else if	(redShip != null)
 			{
 				GV.redShip = redShip;
@@ -181,6 +194,7 @@ package net.natpat
 		
 		public function connectPath():void
 		{
+			if (selected == this) return;
 			for (var i:int = 0; i < GV.currentRoute.length; i++)
 			{
 				if (GV.currentRoute[i].from == this)
@@ -190,7 +204,7 @@ package net.natpat
 					return;
 				}
 			}
-				
+			
 			var wc:WaypointConnection = selected.isConnectedTo(this);
 			if (wc == null) return;
 			
@@ -222,15 +236,31 @@ package net.natpat
 			}
 		}
 		
-		public function green():void
+		public function makeVisible():void
 		{
-			greenb = true;
+			visible = true;
 		}
 		
 		public function render(buffer:BitmapData):void
 		{
+			if (selected == this)
+			{
+				ss.changeAnim(colour + "sel");
+			}
+			else if (mouseOver == this)
+			{
+				ss.changeAnim(colour + "over");
+			}
+			else  if (visible)
+			{
+				ss.changeAnim(colour + "vis");
+			}
+			else
+			{
+				ss.changeAnim(colour);
+			}
+			visible = false;
 			ss.render(buffer, x, y);
-			greenb = false;
 			if (GV.debuggingConnections)
 			{
 				for each (var c:WaypointConnection in connections)

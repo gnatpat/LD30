@@ -4,6 +4,7 @@ package net.natpat
 	import flash.geom.Matrix;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
+	import net.natpat.utils.Sfx;
 	import net.natpat.utils.WaypointConnection;
 	/**
 	 * ...
@@ -49,6 +50,9 @@ package net.natpat
 		public var move:Boolean = true;
 		
 		
+			
+		public var wobbleTime:Number = 0.2;
+		
 		public function Ship(route:Route, cost:int = 50) 
 		{
 			
@@ -68,12 +72,7 @@ package net.natpat
 			
 			getDir();
 			
-			var wobbleTime:Number = 0.2;
-			
 			ss = new SpriteSheet(Assets.SHIP, 354, 316, 0.01);
-			ss.addAnim("wobble", [[0, 2, wobbleTime], [1, 2, wobbleTime], [2, 2, wobbleTime], [3, 2, wobbleTime], [4, 2, wobbleTime], [5, 2, wobbleTime], [6, 2, wobbleTime], [7, 2, wobbleTime], [8, 2, wobbleTime], [9, 2, wobbleTime], [10, 2, wobbleTime]], true);
-			ss.addAnim("death", [[0, 0, 0.1], [1, 0, 0.1], [2, 0, 0.1], [3, 0, 0.1], [4, 0, 0.1], [5, 0, 0.1], [6, 0, 0.3, remove]], true);
-			ss.changeAnim("wobble");
 			this.cost = cost;
 			
 			if(cc != null)
@@ -81,6 +80,15 @@ package net.natpat
 			
 			shoreLeave = 0;
 			paid = true;
+			
+			addAnims();
+		}
+		
+		public function addAnims():void
+		{
+			ss.addAnim("wobble", [[0, 2, wobbleTime], [1, 2, wobbleTime], [2, 2, wobbleTime], [3, 2, wobbleTime], [4, 2, wobbleTime], [5, 2, wobbleTime], [6, 2, wobbleTime], [7, 2, wobbleTime], [8, 2, wobbleTime], [9, 2, wobbleTime], [10, 2, wobbleTime]], true);
+			ss.addAnim("death", [[0, 0, 0.1], [1, 0, 0.1], [2, 0, 0.1], [3, 0, 0.1], [4, 0, 0.1], [5, 0, 0.1], [6, 0, 0.3, remove]], true);
+			ss.changeAnim("wobble");
 		}
 		
 		public function update():void
@@ -106,6 +114,7 @@ package net.natpat
 				y += dir.y * GV.elapsed * speed;
 			}
 			
+			ss.masterScale = scale;
 			if (scales)
 			{
 				if ((waypoint == route.connections.length - 1 && next == 1)
@@ -113,21 +122,16 @@ package net.natpat
 				{
 					ss.masterScale = Math.min(scale, (GV.dist(x, y, xDest, yDest)) / 25 * scale);
 				}
-				else if (waypoint == 0 && next == 1)
+				if (waypoint == 0 && next == 1)
 				{
 					ss.masterScale = Math.min(scale, (GV.dist(x, y, route.connections[waypoint].from.x, route.connections[waypoint].from.y)) / 25 * scale);
 				}
-				else if (waypoint == route.connections.length - 1 && next == -1) 
+				if (waypoint == route.connections.length - 1 && next == -1) 
 				{
 					ss.masterScale = Math.min(scale, (GV.dist(x, y, route.connections[waypoint].to.x, route.connections[waypoint].to.y)) / 25 * scale);
 				}
-				else
-				{
-					ss.masterScale = scale;
-				}
+				
 			}
-			else 
-				ss.masterScale = scale;
 			
 			
 			if (move && x * dirSign.x >= xDest * dirSign.x 
@@ -157,24 +161,13 @@ package net.natpat
 				waypoint += next;
 				next = -next;
 			}
-			else
-			{
-				if (cc.to.hasPirate)
-				{
-					if (canKillPirates)
-					{
-						cc.to.clearPirate();
-					}
-					else
-					{
-						cc.to.pirateKill();
-						ss.changeAnim("death");
-						move =false;
-					}
-				}
-			}
 			
 			waypoint += next;
+			
+			if (cc.from.hasPirate)
+			{
+				pirate();
+			}
 			if (dirUpdate)
 				getDir();
 		}
@@ -182,6 +175,15 @@ package net.natpat
 		public function remove():void
 		{
 			sm.removeShip(this);
+		}
+		
+		public function pirate():void
+		{
+			trace("PIRATES!");
+			cc.to.pirateKill();
+			ss.changeAnim("death");
+			move = false;
+			Sfx.sfxs["alert"].play();
 		}
 		
 		public function getDir():void

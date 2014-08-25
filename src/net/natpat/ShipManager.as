@@ -33,7 +33,7 @@ package net.natpat
 		public function removeShip(ship:Ship, replacing:Boolean = false ):void
 		{
 			ships.splice(ships.indexOf(ship), 1);
-			if(!replacing) ship.homePort.removeShip(ship);
+			if(!replacing && ship.homePort != null) ship.homePort.removeShip(ship);
 		}
 		
 		public function update():void
