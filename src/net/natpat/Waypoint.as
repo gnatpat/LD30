@@ -111,10 +111,17 @@ package net.natpat
 			}
 			
 			var chance:Number =  Math.random();
-			if (!(this is Port) && GV.dist(x, y, homePort.x, homePort.y) < GC.MAX_CONNECTION_LENGTH && chance < GC.PIRATE_CHANCE)
+			if (this is Port)
+			{
+				if (homePort != this && Port(this).beenTo && chance / 2 < GC.PIRATE_CHANCE)
+				{
+					hasPirate = true;
+				}
+			}
+			else if (GV.dist(x, y, homePort.x, homePort.y) < GC.MAX_CONNECTION_LENGTH && chance < GC.PIRATE_CHANCE)
 			{
 				this.hasPirate = true;
-				//trace("Pirate at " + x + ", " + y);
+				trace("Pirate at " + x + ", " + y);
 			}
 			
 			if (selected == this)

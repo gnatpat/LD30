@@ -62,7 +62,17 @@ package net.natpat
 			GV.zoom = Math.min(5, GV.zoom);
 		}
 		
-		public static var gold:int = 40;
+		public static var _gold:Number = 40;
+		
+		public static function get gold():int
+		{
+			return int(_gold);
+		}
+		
+		public static function set gold(gold:int):void
+		{
+			_gold = _gold;
+		}
 		
 		public static var shipCost:int = 50;
 		public static var redShipCost:int = 20;

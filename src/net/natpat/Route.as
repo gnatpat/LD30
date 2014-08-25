@@ -11,7 +11,7 @@ package net.natpat
 		
 		public var connections:Vector.<WaypointConnection>
 		public var time:int;
-		public var gold:int;
+		public var _gold:int;
 		
 		public var lineGraphic:Shape;
 		
@@ -27,7 +27,6 @@ package net.natpat
 			this.distance = distance;
 			
 			
-			gold = 5 + 0.01 * distance;
 			if (connections[0].from is Port)
 				from = Port(connections[0].from);
 			else from = null
@@ -40,8 +39,18 @@ package net.natpat
 			{
 				to = null;
 			}
+			if (to != null && from != null)
+				_gold = 5 + 0.01 * GV.dist(to.x, to.y, from.x, from.y);
 			
 		}
+		
+		
+		public function get gold():int
+		{
+			return _gold * to.levelMult;
+		}
+		
+		
 		
 	}
 

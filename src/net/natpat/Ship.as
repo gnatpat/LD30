@@ -87,7 +87,7 @@ package net.natpat
 		public function addAnims():void
 		{
 			ss.addAnim("wobble", [[0, 2, wobbleTime], [1, 2, wobbleTime], [2, 2, wobbleTime], [3, 2, wobbleTime], [4, 2, wobbleTime], [5, 2, wobbleTime], [6, 2, wobbleTime], [7, 2, wobbleTime], [8, 2, wobbleTime], [9, 2, wobbleTime], [10, 2, wobbleTime]], true);
-			ss.addAnim("death", [[0, 0, 0.1], [1, 0, 0.1], [2, 0, 0.1], [3, 0, 0.1], [4, 0, 0.1], [5, 0, 0.1], [6, 0, 0.3, remove]], true);
+			ss.addAnim("death", [[0, 0, 0.1], [1, 0, 0.1], [2, 0, 0.1], [3, 0, 0.1], [4, 0, 0.1], [5, 0, 0.1], [6, 0, 0.1], [7, 0, 0.1], [8, 0, 0.1], [9, 0, 0.1], [10, 0, 0.1], [11, 0, 0.3, remove]], true);
 			ss.changeAnim("wobble");
 		}
 		
@@ -99,9 +99,14 @@ package net.natpat
 			{
 				shoreLeave -= GV.elapsed;
 				ss.masterScale = 0;
-				if (waypoint == 0 && shoreLeave < 1 && !paid)
+				if (waypoint == 0 && next == 1 && shoreLeave < 1 && !paid)
 				{
 					GV.makeGold(route.gold, x, y);
+					paid = true;
+				}
+				if (waypoint == route.connections.length - 1 && next == -1 && shoreLeave < 1 && !paid)
+				{
+					Port(cc.to).takeResources();
 					paid = true;
 				}
 				return;
@@ -153,11 +158,12 @@ package net.natpat
 			 || (waypoint == 0                            && next == -1))
 			{
 				shoreLeave = 2;
-				if (waypoint == 0 && next == -1 && scales)
+				if (scales)
 				{
-					homePort.checkForReplace(this);
+					if (waypoint == 0 && next == -1) homePort.checkForReplace(this);
 					paid = false;
 				}
+				
 				waypoint += next;
 				next = -next;
 			}
@@ -169,12 +175,15 @@ package net.natpat
 			{
 				pirate();
 			}
+			
+			
 			if (dirUpdate)
 				getDir();
 		}
 		
 		public function remove():void
 		{
+			Sfx.sfxs["alert"].play();
 			sm.removeShip(this);
 		}
 		
@@ -184,14 +193,15 @@ package net.natpat
 			cc.to.pirateKill();
 			ss.changeAnim("death");
 			move = false;
-			Sfx.sfxs["alert"].play();
+			Sfx.sfxs["sink"].play();
 		}
 		
 		public function getDir():void
 		{
 			if (cc == null)
 			{
-				xDest = x;
+				xDest = x;                                                            
+				
 				yDest = y;
 				getDirDir(x, y);
 				return;

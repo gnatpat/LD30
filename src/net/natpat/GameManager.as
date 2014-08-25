@@ -5,6 +5,9 @@ package net.natpat {
 	import flash.display.Shader;
 	import flash.display.Shape;
 	import flash.events.TextEvent;
+	import flash.events.TimerEvent;
+	import flash.filters.DropShadowFilter;
+	import flash.geom.ColorTransform;
 	import flash.geom.Matrix;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
@@ -81,10 +84,30 @@ package net.natpat {
 		public var musics:Vector.<Sfx>
 		
 		public var currentMusic:int = 3;
+		public var lastMusic:int = 4;
 		
 		public var time:Number;
 		
 		public var timeText:Text;
+		
+		public var oldMouseX:int;
+		public var oldMouseY:int;
+		
+		public var sfxBaseTime:Number = 1;
+		public var sfxTimeAdd:Number = 1;
+		public var sfxTime:Number = 0;
+		public var sfxTimeToGetTo:Number = 0;
+		public var atmos:Array = ["sail", "sail", "sail", "sail", "seagull", "seagull", "seagull", "seagull", "wind", "wind", "wind", "wind", "yarr1", "yarr2", "creak", "creak", "creak", "creak"];
+		
+		public var yearText:Text;
+		public var yearDescText:Text;
+		public var yearTextBuffer:BitmapData;
+		
+		public var oldYear:int = 1;
+		public var year:int = 1;
+		
+		public var yearAlpha:Number = 0;
+		public var yearTextLength:Number = 3;
 		
 		public function GameManager(stageWidth:int, stageHeight:int) 
 		{
@@ -451,16 +474,21 @@ package net.natpat {
 			
 			musics = new Vector.<Sfx>(4);
 			
-			musics[0] = new Sfx(Assets.MUSIC1, false, playSoundtrack);
-			musics[1] = new Sfx(Assets.MUSIC2, false, playSoundtrack);
-			musics[2] = new Sfx(Assets.MUSIC3, false, playSoundtrack);
-			musics[3] = new Sfx(Assets.MUSIC4, false, playSoundtrack);
+			musics[0] = new Sfx(Assets.MUSIC1, false, playSoundtrack, 1);
+			musics[1] = new Sfx(Assets.MUSIC2, false, playSoundtrack, 1);
+			musics[2] = new Sfx(Assets.MUSIC3, false, playSoundtrack, 1);
+			musics[3] = new Sfx(Assets.MUSIC4, false, playSoundtrack, 1);
 			
 			musics[currentMusic].play();
 			
 			Sfx.addSfxs();
 			
-			time = 0;
+			time = 45;
+			
+			yearTextBuffer = new BitmapData(GC.SCREEN_WIDTH, GC.SCREEN_HEIGHT, true, 0);
+			yearText = new Text( -1, -1, "Start of Year 2", 40, false, 0);
+			yearDescText = new Text( -1, GC.SCREEN_HEIGHT / 2, "Wealth of ports changed!", 20, false, 0);
+			yearDescText.y = GC.SCREEN_HEIGHT / 2 + yearText.width / 2;
 		}
 		
 		public function helpUp():void
@@ -518,6 +546,16 @@ package net.natpat {
 			renderer.copyPixels(clickAndDrag, clickAndDrag.rect, new Point(cadx, cady));
 			
 			GuiManager.render();
+			
+			trace(yearAlpha);
+			if (yearAlpha > 0)
+			{
+				if (yearAlpha < 1.5)
+				{
+					yearTextBuffer.colorTransform(yearTextBuffer.rect, new ColorTransform(1, 1, 1, 1, 0, 0, 0, Math.ceil(255 * -GV.elapsed / yearTextLength * 2)));
+				}
+				renderer.copyPixels(yearTextBuffer, yearTextBuffer.rect, GC.ZERO, null, null, true);
+			}
 			
 			renderer.unlock();
 		}
@@ -635,9 +673,9 @@ package net.natpat {
 							if (GV.redShipAdded)
 							{
 								addRedShip();
-								if (Waypoint.selected is Port)
+								if (Waypoint.selected is Port && !Waypoint.selected.hasPirate)
 								{
-									GuiManager.add(new DialogOk(null, "Privateers can't go\ninto ports!", 18));
+									GuiManager.add(new DialogOk(null, "Privateers can't go\ninto ports unless there are pirates invading!!", 18));
 								}
 							}
 							else
@@ -685,26 +723,33 @@ package net.natpat {
 			
 			sm.update();
 			
-			if (Input.keyDown(Key.LEFT) || Input.mouseX < GC.SCROLL_BORDER)
+			if (Input.keyDown(Key.LEFT))
 			{
 				GV.camera.x -= GC.CAMERA_SCROLL * GV.zoom * GV.elapsed;
 			}
 			
-			if (Input.keyDown(Key.RIGHT) || Input.mouseX > GC.SCREEN_WIDTH - GC.SCROLL_BORDER)
+			if (Input.keyDown(Key.RIGHT))
 			{
 				GV.camera.x += GC.CAMERA_SCROLL * GV.zoom * GV.elapsed;
 			}
 			
-			if (Input.keyDown(Key.UP) || Input.mouseY < GC.SCROLL_BORDER)
+			if (Input.keyDown(Key.UP))
 			{
 				GV.camera.y -= GC.CAMERA_SCROLL * GV.zoom * GV.elapsed;
 			}
 			
-			if (Input.keyDown(Key.DOWN) || Input.mouseY > GC.SCREEN_HEIGHT - GC.SCROLL_BORDER)
+			if (Input.keyDown(Key.DOWN))
 			{
 				GV.camera.y += GC.CAMERA_SCROLL * GV.zoom * GV.elapsed;
 			}
 			
+			if (Input.mouseDown && !GV.makingRoute)
+			{
+				GV.camera.x += (oldMouseX - GV.mouseX);
+				GV.camera.y += (oldMouseY - GV.mouseY);
+			}
+			oldMouseX = GV.mouseX;
+			oldMouseY = GV.mouseY;
 			if (Input.keyDown(Key.Q))
 			{
 				GV.zoomOut();
@@ -715,6 +760,8 @@ package net.natpat {
 				GV.zoomIn();
 			}
 			
+			
+			
 			GV.camera.x = Math.max(GC.SCREEN_WIDTH * GV.zoom / 2, Math.min(7000 - GC.SCREEN_WIDTH * GV.zoom / 2, GV.camera.x));
 			GV.camera.y = Math.max(GC.SCREEN_HEIGHT * GV.zoom / 2, Math.min(3130 - GC.SCREEN_HEIGHT * GV.zoom / 2, GV.camera.y));
 			
@@ -723,9 +770,35 @@ package net.natpat {
 			gold.x = GC.SCREEN_WIDTH - gold.width - 10;
 			
 			time += GV.elapsed;
-			var weeks:int = int(time);
+			var weeks:int = int(time) / GC.SECONDS_IN_WEEK;
 			timeText.text = "Year " + (int(weeks / 52) + 1) + ", Week " + ((weeks % 52) + 1);
 			//trace(GV.mouseX, GV.mouseY);
+			
+			year = int(weeks / 52) + 1;
+			
+			yearAlpha -= GV.elapsed;
+			yearAlpha = Math.max(0, yearAlpha);
+			
+			if (oldYear != year)
+			{
+				yearTextBuffer.fillRect(yearTextBuffer.rect, 0);
+				yearText.text = "Start of Year " + year;
+				yearText.renderOnBuffer(yearTextBuffer);
+				yearDescText.renderOnBuffer(yearTextBuffer);
+				yearTextBuffer.applyFilter(yearTextBuffer, yearTextBuffer.rect, GC.ZERO, new DropShadowFilter(6, 45, 0, 0.44, 1, 1, 6));
+				oldYear = year;
+				yearAlpha = yearTextLength;
+			}
+			
+			
+			sfxTime += GV.elapsed;
+			if (sfxTime > sfxTimeToGetTo)
+			{
+				var i:int = GV.rand(atmos.length);
+				Sfx.sfxs[atmos[i]].play();
+				sfxTime = 0;
+				sfxTimeToGetTo = sfxBaseTime + sfxTimeAdd * Math.random();
+			}
 			
 			Input.update();
 		}
@@ -795,8 +868,9 @@ package net.natpat {
 			var next:int;
 			do {
 				next = GV.rand(4);
-			} while (next == currentMusic);
+			} while (next == currentMusic || next == lastMusic);
 			musics[next].play();
+			lastMusic = currentMusic;
 			currentMusic = next;
 		}
 	}

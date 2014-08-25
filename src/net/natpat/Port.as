@@ -38,6 +38,20 @@ package net.natpat
 		public var foundColour:String = "yellow";
 		public var unknownColour:String = "grey";
 		
+		public var saidHasPirate:Boolean = false;
+		
+		public var pirates:Boolean = false;
+		public var pirateSS:SpriteSheet = new SpriteSheet(Assets.PIRATES, 128, 144, 0.5);
+		
+		public var levelSS:SpriteSheet;
+		
+		public var level:Number = 0.5;
+		
+		public var boatRemoves:Number = 0.1;
+		
+		public var time:Number;
+		
+		public var richness:Number = 0.5;
 		
 		public function Port(x:int, y:int, name:String) 
 		{
@@ -91,6 +105,21 @@ package net.natpat
 				homePort = this;
 				colour = homeColour;
 			}
+			
+			pirateSS.addAnim("fire", [[0, 0, 0.2], [1, 0, 0.4], [2, 0, 0.2], [3, 0, 0.2], [4, 0, 0.2], [5, 0, 0.4], [6, 0, 0.2], [7, 0, 0.2], [8, 0, 0.2], [8, 0, 0.2], [0, 1, 0.2], [1, 1, 0.2], [2, 1, 0.2], [3, 1, 0.2, clearPirate]], true);
+			pirateSS.addAnim("default", [[0, 0, 0.2], [2, 0, 0.2], [3, 0, 0.2], [4, 0, 0.2]], true);
+			pirateSS.changeAnim("default");
+			
+			levelSS = new SpriteSheet(Assets.LEVELS, 50, 100, 0.6);
+			levelSS.addAnim("5", [[0, 0, 0.1]], true);
+			levelSS.addAnim("4", [[1, 0, 0.1]], true);
+			levelSS.addAnim("3", [[2, 0, 0.1]], true);
+			levelSS.addAnim("2", [[3, 0, 0.1]], true);
+			levelSS.addAnim("1", [[4, 0, 0.1]], true);
+			levelSS.addAnim("0", [[5, 0, 0.1]], true);
+			time = 0;
+			
+			setRichness();
 		}
 		
 		override public function clicked():void 
@@ -120,9 +149,18 @@ package net.natpat
 			}
 		}
 		
+		public function takeResources():void
+		{
+			level -= boatRemoves;
+			level = Math.max(0, level);
+		}
+		
 		override public function update():void 
 		{
 			super.update();
+			level += GV.elapsed / GC.FULL_LEVEL_INCREASE;
+			level = Math.min(1, level);
+			levelSS.changeAnim("" + int(level / 0.2));
 			if (gui != null && guiPort != this)
 			{
 				GuiManager.remove(gui);
@@ -134,7 +172,33 @@ package net.natpat
 				gui = null;
 				guiPort = null;
 			}
+			if (hasPirate && !saidHasPirate)
+			{
+				saidHasPirate = true;
+				GuiManager.add(new DialogOk(null, "Pirates have invaded the port of\n" + name + "! Send a privateer to\nclear them out or you'll keep losing money!"));
+			}
+			if (hasPirate )
+			{
+				pirateSS.update();
+				GV.gold -= GV.elapsed * richness * GC.GOLD_LOSS_AT_RICHEST_PORT_PER_SECOND;
+			}
+			time += GV.elapsed;
+			if (time > 52 * GC.SECONDS_IN_WEEK)
+			{
+				setRichness();
+				time -= 52 * GC.SECONDS_IN_WEEK;
+			}
 		}
+		
+		public function setRichness():void
+		{
+			var richnessChange:Number = Math.random() - 0.5;
+			richness += richnessChange;
+			richness = Math.min(1, Math.max(0, richness));
+			level = richness * 0.8 + 0.1;
+			boatRemoves = richness * -(39 / 100) + 1 / 20;
+		}
+		
 		
 		
 		override public function render(buffer:BitmapData):void
@@ -143,17 +207,33 @@ package net.natpat
 			{
 				c.render();
 			}
-			text.render(buffer, x, y - 40 - 7 * (GV.zoom - 1), true, GC.SPRITE_ZOOM_RATIO * 2, true);
 			if (visible)
 			{
 				ss.changeAnim(colour + "vis");
 			}
 			super.render(buffer);
+			levelSS.render(buffer, x + 40 + (GV.zoom - 1) * 15, y - 10, true, GC.SPRITE_ZOOM_RATIO, true);
+			text.render(buffer, x, y - 40 - 7 * (GV.zoom - 1), true, GC.SPRITE_ZOOM_RATIO * 2, true);
 			var m:Matrix = new Matrix;
 			if (guiPort == this && gui != null)
 			{
 				gui.setPos(GV.getScreenX(x) + 10, GV.getScreenY(y) - 170);
 			}
+			if (hasPirate)
+			{
+				pirateSS.render(buffer, x, y - 40, true, GC.SPRITE_ZOOM_RATIO, true);
+			}
+		}
+		
+		override public function clearPirate():void 
+		{
+			super.clearPirate();
+			saidHasPirate = false;
+		}
+		
+		public function get levelMult():Number 
+		{
+			return ((level / 0.9) + 0.1) * 10 / 5;
 		}
 		
 		public function addShip(ship:Ship, index:int = 0):void

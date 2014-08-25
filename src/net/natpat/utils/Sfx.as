@@ -27,17 +27,18 @@ package net.natpat.utils
 		
 		public static var sfxs:Object;
 		
+		
 		/**
 		 * Create a new sound object, 
 		 * @param	soundFile
 		 */
-		public function Sfx(soundFile:Class, loop:Boolean = false, callback:Function = null) 
+		public function Sfx(soundFile:Class, loop:Boolean = false, callback:Function = null, volume:Number = 0.7) 
 		{
 			sound = new soundFile;
 			soundChannel = new SoundChannel();
 			position = 0;
 			soundTransform = new SoundTransform();
-			soundTransform.volume = 1;
+			soundTransform.volume = volume;
 			this.callback = callback;
 		}
 		
@@ -53,7 +54,7 @@ package net.natpat.utils
 			sfxs["moneyOut"] = new Sfx(Assets.SFX_MONEY_OUT);
 			sfxs["sail"] = new Sfx(Assets.SFX_SAIL);
 			sfxs["seagull"] = new Sfx(Assets.SFX_SEAGULL);
-			sfxs["sink"] = new Sfx(Assets.SFX_SINK);
+			sfxs["sink"] = new Sfx(Assets.SFX_SINK, false, null, 1);
 			sfxs["creak"] = new Sfx(Assets.SFX_CREAK);
 			sfxs["wind"] = new Sfx(Assets.SFX_WIND);
 			sfxs["yarr1"] = new Sfx(Assets.SFX_YARR1);
@@ -64,7 +65,7 @@ package net.natpat.utils
 		{
 			loop = boolloop;
 			soundChannel = sound.play(position, 0);
-			soundChannel.soundTransform = soundTransform;
+			//soundChannel.soundTransform = soundTransform;
 			soundChannel.addEventListener(Event.SOUND_COMPLETE, soundComplete);
 		}
 		

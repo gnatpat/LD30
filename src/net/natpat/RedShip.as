@@ -19,8 +19,9 @@ package net.natpat
 		public var hasSm:Boolean = false;
 		
 		public var pirateSS:SpriteSheet;
-		
 		public var pirates:Boolean = false;
+		
+		
 		
 		public function RedShip(w:Waypoint, route:Route, cost:int=50) 
 		{

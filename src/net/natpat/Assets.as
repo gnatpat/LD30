@@ -14,6 +14,7 @@ package net.natpat
 		[Embed(source = "../../../assets/REDsprites.png")] public static const RED_SHIP:Class;
 		
 		[Embed(source = "../../../assets/NEWPORTS.png")] public static const PORTS:Class;
+		[Embed(source = "../../../assets/Level.png")] public static const LEVELS:Class;
 		[Embed(source = "../../../assets/Shipyard.png")] public static const SHIPYARD:Class;
 		
 		[Embed(source = "../../../assets/mapp00.png")] public static const MAP00:Class;
