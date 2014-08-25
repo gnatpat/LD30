@@ -6,6 +6,7 @@ package net.natpat
 	import flash.display.BitmapData;
 	import flash.display.Bitmap;
 	import net.natpat.gui.Button;
+	import net.natpat.gui.GoldPlus;
 	import net.natpat.gui.GuiManager;
 	import net.natpat.gui.IGuiElement;
 	import net.natpat.utils.WaypointConnection;
@@ -27,21 +28,46 @@ package net.natpat
 		
 		public static var routePort:Port = null
 		
+		public static var routeForReplace:Boolean = false;
+		
 		public static var routeIndex:int = 0;
+		
+		public static var redShip:RedShip = null;
 		
 		public static var zoom:Number = 5;
 		
-		public static var gold:int = 9999999;
+		public static var goldShip:Boolean = false;
+		
+		public static function get redShipAdded():Boolean
+		{
+			return (GV.redShip != null && GV.redShip.sm != null);
+		}
+		
+		public static function zoomIn():void
+		{
+			GV.zoom -= 5 * GV.elapsed;
+			GV.zoom = Math.max(1, GV.zoom);
+		}
+		
+		public static function zoomOut():void
+		{
+			GV.zoom += 5 * GV.elapsed;
+			GV.zoom = Math.min(5, GV.zoom);
+		}
+		
+		public static var gold:int = 100;
 		
 		public static var shipCost:int = 50;
+		public static var redShipCost:int = 70;
+		public static var goldShipCost:int = 30;
 		
 		public static var w:Waypoint;
 		
-		public static const debuggingConnections:Boolean = true
+		public static const debuggingConnections:Boolean = false;
 		
 		public static function get routeCost():int
 		{
-			return int(routeDistance / GC.DIST_TO_COST_RATIO) + shipCost;
+			return GV.redShipAdded  ? 0 : int(routeDistance / GC.DIST_TO_COST_RATIO) + (routeForReplace ? 0 : (GV.redShip != null? redShipCost : (GV.goldShip ? goldShipCost : shipCost)));
 		}
 		
 		public static function get mouseX():int
@@ -67,6 +93,7 @@ package net.natpat
 		public static function makeGold(gold:int, x:int, y:int):void
 		{
 			GV.gold += gold;
+			GuiManager.add(new GoldPlus(x, y, gold));
 		}
 		
 		public static function getScreenX(x:int):int
@@ -208,6 +235,25 @@ package net.natpat
 			if (source is Class) return Bitmap(new source).bitmapData;
 			if (source is BitmapData) return source;
 			return null;
+		}
+		
+		public static function dist(x1:int, y1:int, x2:int, y2:int):Number
+		{
+			return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+		}
+		
+		public static var seed:int = 777;
+
+		public static const MAX_RATIO:Number = 1 / int.MAX_VALUE;
+		public static const  MIN_MAX_RATIO:Number = -MAX_RATIO;
+
+		public static function random():Number
+		{
+		   seed ^= (seed << 21);
+		   seed ^= (seed >>> 35);
+		   seed ^= (seed << 4);
+		   if (seed < 0) return seed * MAX_RATIO;
+		   return seed * MIN_MAX_RATIO;
 		}
 	}
 

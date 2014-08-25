@@ -32,6 +32,10 @@ package net.natpat
 		
 		public var id:int = 0;
 		
+		public var colour:String;
+		
+		public var redShip:RedShip = null;
+		
 		public function Waypoint(x:int, y:int) 
 		{
 			this.x = x;
@@ -43,10 +47,36 @@ package net.natpat
 			ss.addAnim("red", [[0, 0, 0.1]], true);
 			ss.addAnim("redover", [[0, 0, 0.1]], true);
 			ss.addAnim("redsel", [[0, 0, 0.1]], true);
-			ss.filterAnim("redover", new GlowFilter(0xcccc00, 1, 32, 32, 2 ), 1.3);
-			ss.filterAnim("redsel", new GlowFilter(0x0000cc, 1, 32, 32, 2), 1.3);
+			ss.addAnim("blue", [[1, 0, 0.1]], true);
+			ss.addAnim("blueover", [[1, 0, 0.1]], true);
+			ss.addAnim("bluesel", [[1, 0, 0.1]], true);
+			ss.addAnim("green", [[2, 0, 0.1]], true);
+			ss.addAnim("greenover", [[2, 0, 0.1]], true);
+			ss.addAnim("greensel", [[2, 0, 0.1]], true);
+			ss.addAnim("grey", [[3, 0, 0.1]], true);
+			ss.addAnim("greyover", [[3, 0, 0.1]], true);
+			ss.addAnim("greysel", [[3, 0, 0.1]], true);
+			ss.addAnim("orange", [[4, 0, 0.1]], true);
+			ss.addAnim("orangeover", [[4, 0, 0.1]], true);
+			ss.addAnim("orangesel", [[4, 0, 0.1]], true);
+			ss.addAnim("purple", [[5, 0, 0.1]], true);
+			ss.addAnim("purpleover", [[5, 0, 0.1]], true);
+			ss.addAnim("purplesel", [[5, 0, 0.1]], true);
+			ss.addAnim("black", [[6, 0, 0.1]], true);
+			ss.addAnim("blackover", [[6, 0, 0.1]], true);
+			ss.addAnim("blacksel", [[6, 0, 0.1]], true);
+			ss.addAnim("yellow", [[7, 0, 0.1]], true);
+			ss.addAnim("yellowover", [[7, 0, 0.1]], true);
+			ss.addAnim("yellowsel", [[7, 0, 0.1]], true);
+			ss.addAnim("sea", [[8, 0, 0.1]], true);
+			ss.addAnim("seaover", [[8, 0, 0.1]], true);
+			ss.addAnim("seasel", [[8, 0, 0.1]], true);
+			ss.filterAnim("seaover", new GlowFilter(0xcccc00, 1, 32, 32, 2 ), 1.3);
+			ss.filterAnim("seasel", new GlowFilter(0x0000cc, 1, 32, 32, 2), 1.3);
 			
-			ss.changeAnim("red");
+			colour = "sea";
+			
+			ss.changeAnim(colour);
 		}
 		
 		public function update():void
@@ -71,6 +101,13 @@ package net.natpat
 				mouseOver = null;
 			}
 			
+			var chance:Number =  Math.random();
+			if (chance < GC.PIRATE_CHANCE)
+			{
+				this.hasPirate = true;
+				trace("Pirate at " + x + ", " + y);
+			}
+			
 			if (selected == this && !greenb)
 			{
 				greenNeighbours();
@@ -78,15 +115,15 @@ package net.natpat
 			
 			if (mouseOver == this)
 			{
-				ss.changeAnim("redover");
+				ss.changeAnim(colour + "over");
 			}
 			else if (selected == this)
 			{
-				ss.changeAnim("redsel");
+				ss.changeAnim(colour + "sel");
 			}
 			else 
 			{
-				ss.changeAnim("red");
+				ss.changeAnim(colour);
 			}
 			ss.update();
 		}
@@ -127,6 +164,19 @@ package net.natpat
 				return;
 			}
 			if (selected != null && GV.makingRoute) connectPath();
+			else if	(redShip != null)
+			{
+				GV.redShip = redShip;
+				startRoute(-1);
+			}
+		}
+		
+		public function startRoute(index:int):void
+		{
+			GV.makingRoute = true;
+			selected = this;
+			//GV.routePort = this;
+			GV.routeIndex = index;
 		}
 		
 		public function connectPath():void
@@ -181,9 +231,12 @@ package net.natpat
 		{
 			ss.render(buffer, x, y);
 			greenb = false;
-			for each (var c:WaypointConnection in connections)
+			if (GV.debuggingConnections)
 			{
-				c.render();
+				for each (var c:WaypointConnection in connections)
+				{
+					c.render();
+				}
 			}
 		}
 		

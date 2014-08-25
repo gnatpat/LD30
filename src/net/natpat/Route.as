@@ -23,13 +23,19 @@ package net.natpat
 			this.connections = connections;
 			this.lineGraphic = graphic;
 			gold = 10;
-			from = Port(connections[0].from);
-			var i:int = 0;
-			while (!(connections[i].to is Port))
+			if (connections[0].from is Port)
+				from = Port(connections[0].from);
+			else from = null
+			var tow:Waypoint = connections[connections.length - 1].to;
+			if (tow is Port)
 			{
-				i++;
+				to = Port(tow);
 			}
-			to = Port(connections[i].to);
+			else
+			{
+				to = null;
+			}
+			
 		}
 		
 	}

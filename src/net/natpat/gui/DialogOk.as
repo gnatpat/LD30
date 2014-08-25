@@ -11,12 +11,11 @@ package net.natpat.gui
 	 * ...
 	 * @author Nathan Patel
 	 */
-	public class Dialog implements IGuiElement 
+	public class DialogOk implements IGuiElement 
 	{
 		
 		public var background:BitmapData
 		public var okay:Button;
-		public var cancel:Button;
 		public var text:Text;
 		
 		public var x:int;
@@ -26,22 +25,19 @@ package net.natpat.gui
 		public var height:int;
 		
 		public var ok:Function;
-		public var no:Function;
 		
-		public function Dialog(ok:Function, no:Function, text:String, size:int = 18) 
+		public function DialogOk(ok:Function = null, text:String = "", size:int = 18) 
 		{
 			Input.mouseReleased = false;
-			background = Bitmap(new Assets.DIALOG).bitmapData;
+			background = Bitmap(new Assets.DIALOGOK).bitmapData;
 			width = background.width;
 			height = background.height;
 			x = (GC.SCREEN_WIDTH - width) / 2;
 			y = (GC.SCREEN_HEIGHT - height) / 2;
 			this.text = new Text(0, y + 122, text, size, false, 0, true);
 			this.text.x = (GC.SCREEN_WIDTH - this.text.width) / 2
-			okay = new Button(new BitmapData(1, 1, true, 0), x + 190, y + 205, 90, 50, okclick);
-			cancel = new Button(new BitmapData(1, 1, true, 0), x + 330, y + 210, 90, 50, noclick)
+			okay = new Button(new BitmapData(1, 1, true, 0), x + 260, y + 205, 90, 50, okclick);
 			this.ok = ok;
-			this.no = no;
 		}
 		
 		/* INTERFACE net.natpat.gui.IGuiElement */
@@ -56,7 +52,6 @@ package net.natpat.gui
 		{
 			GV.onGUI = this;
 			okay.update();
-			cancel.update();
 			text.update();
 		}
 		
@@ -72,13 +67,7 @@ package net.natpat.gui
 		
 		public function okclick():void
 		{
-			ok();
-			GuiManager.remove(this);
-		}
-		
-		public function noclick():void
-		{
-			no();
+			if(ok != null) ok();
 			GuiManager.remove(this);
 		}
 	}

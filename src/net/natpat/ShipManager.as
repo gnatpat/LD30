@@ -24,13 +24,16 @@ package net.natpat
 		{
 			ships.push(ship);
 			ship.sm = this;
-			port.addShip(ship, index);
+			if (port != null && index != -1)
+			{
+				port.addShip(ship, index);
+			}
 		}
 		
-		public function removeShip(ship:Ship):void
+		public function removeShip(ship:Ship, replacing:Boolean = false ):void
 		{
 			ships.splice(ships.indexOf(ship), 1);
-			ship.homePort.removeShip(ship);
+			if(!replacing) ship.homePort.removeShip(ship);
 		}
 		
 		public function update():void

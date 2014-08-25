@@ -38,6 +38,17 @@ package net.natpat
 		
 		public var homePort:Port;
 		
+		public var shoreLeave:Number;
+		
+		public var paid:Boolean;
+		
+		public var scales:Boolean = true;
+		
+		public var scale:Number = 0.4;
+		
+		public var move:Boolean = true;
+		
+		
 		public function Ship(route:Route, cost:int = 50) 
 		{
 			
@@ -46,64 +57,126 @@ package net.natpat
 		    dir = new Point();
 			next = 1;
 			
-			x = cc.from.x;
-			y = cc.from.y;
+			if (cc != null)
+			{
+				x = cc.from.x;
+				y = cc.from.y;
+			}
 			
 			dirSign = new Point();
 			dir = new Point();
 			
 			getDir();
 			
-			ss = new SpriteSheet(Assets.SHIP, 100, 74);
+			var wobbleTime:Number = 0.2;
 			
+			ss = new SpriteSheet(Assets.SHIP, 354, 316, 0.01);
+			ss.addAnim("wobble", [[0, 2, wobbleTime], [1, 2, wobbleTime], [2, 2, wobbleTime], [3, 2, wobbleTime], [4, 2, wobbleTime], [5, 2, wobbleTime], [6, 2, wobbleTime], [7, 2, wobbleTime], [8, 2, wobbleTime], [9, 2, wobbleTime], [10, 2, wobbleTime]], true);
+			ss.addAnim("death", [[0, 0, 0.1], [1, 0, 0.1], [2, 0, 0.1], [3, 0, 0.1], [4, 0, 0.1], [5, 0, 0.1], [6, 0, 0.3, remove]], true);
+			ss.changeAnim("wobble");
 			this.cost = cost;
 			
-			homePort = route.from;
+			if(cc != null)
+				homePort = route.from;
+			
+			shoreLeave = 0;
+			paid = true;
 		}
 		
 		public function update():void
 		{
-			x += dir.x * GV.elapsed * speed;
-			y += dir.y * GV.elapsed * speed;
 			
-			if (x * dirSign.x >= xDest * dirSign.x 
-			 && y * dirSign.y >= yDest * dirSign.y)
+			ss.update();
+			if (shoreLeave > 0)
 			{
-				x = xDest                                                                                      
-				y = yDest;
-				
+				shoreLeave -= GV.elapsed;
+				ss.masterScale = 0;
+				if (waypoint == 0 && shoreLeave < 1 && !paid)
+				{
+					GV.makeGold(route.gold, x, y);
+					paid = true;
+				}
+				return;
+			}
+			shoreLeave = 0;
+			
+			if (move)
+			{
+				x += dir.x * GV.elapsed * speed;
+				y += dir.y * GV.elapsed * speed;
+			}
+			
+			if (scales)
+			{
 				if ((waypoint == route.connections.length - 1 && next == 1)
 				 || (waypoint == 0                            && next == -1))
 				{
-					if (waypoint == 0 && next == -1)
-					{
-						GV.makeGold(route.gold, x, y);
-					}
-					waypoint += next;
-					next = -next;
+					ss.masterScale = Math.min(scale, (GV.dist(x, y, xDest, yDest)) / 25 * scale);
+				}
+				else if (waypoint == 0 && next == 1)
+				{
+					ss.masterScale = Math.min(scale, (GV.dist(x, y, route.connections[waypoint].from.x, route.connections[waypoint].from.y)) / 25 * scale);
+				}
+				else if (waypoint == route.connections.length - 1 && next == -1) 
+				{
+					ss.masterScale = Math.min(scale, (GV.dist(x, y, route.connections[waypoint].to.x, route.connections[waypoint].to.y)) / 25 * scale);
 				}
 				else
 				{
-					if (cc.to.hasPirate)
-					{
-						if (canKillPirates)
-						{
-							cc.to.clearPirate();
-						}
-						else
-						{
-							cc.to.pirateKill();
-							remove();
-						}
-					}
+					ss.masterScale = scale;
 				}
-				
-				waypoint += next;
-				getDir();
+			}
+			else 
+				ss.masterScale = scale;
+			
+			
+			if (move && x * dirSign.x >= xDest * dirSign.x 
+			 && y * dirSign.y >= yDest * dirSign.y)
+			{
+				gotToDest();
 			}
 			
-			ss.update();
+		}
+		
+		public function gotToDest():void
+		{
+			x = xDest                                                                                      
+			y = yDest;
 			
+			var dirUpdate:Boolean = true;
+			
+			if ((waypoint == route.connections.length - 1 && next == 1)
+			 || (waypoint == 0                            && next == -1))
+			{
+				shoreLeave = 2;
+				if (waypoint == 0 && next == -1 && scales)
+				{
+					homePort.checkForReplace(this);
+					paid = false;
+				}
+				waypoint += next;
+				next = -next;
+			}
+			else
+			{
+				if (cc.to.hasPirate)
+				{
+					if (canKillPirates)
+					{
+						cc.to.clearPirate();
+					}
+					else
+					{
+						cc.to.pirateKill();
+						ss.changeAnim("death");
+						move =false;
+					}
+				}
+			}
+			
+			waypoint += next;
+			if (dirUpdate)
+				getDir();
 		}
 		
 		public function remove():void
@@ -113,6 +186,13 @@ package net.natpat
 		
 		public function getDir():void
 		{
+			if (cc == null)
+			{
+				xDest = x;
+				yDest = y;
+				getDirDir(x, y);
+				return;
+			}
 			var oldX:int
 			var oldY:int
 			if (next == 1)
@@ -129,6 +209,12 @@ package net.natpat
 				xDest = cc.from.x;
 				yDest = cc.from.y;
 			}
+			
+			getDirDir(oldX, oldY);
+		}
+		
+		public function getDirDir(oldX:int, oldY:int):void
+		{
 			dir.x = xDest - oldX;
 			dir.y = yDest - oldY;
 			
@@ -136,7 +222,6 @@ package net.natpat
 			
 			dirSign.x = dir.x < 0 ? -1 : 1;
 			dirSign.y = dir.y < 0 ? -1 : 1;
-			
 		}
 		
 		public function get cc():WaypointConnection

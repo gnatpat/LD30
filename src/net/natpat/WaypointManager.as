@@ -22,12 +22,58 @@ package net.natpat
 			id = 0;
 		}
 		
+		public function addOldPos(waypoint:Waypoint):void
+		{
+			waypoint.x *=0.43554
+			waypoint.y *= 0.43554
+			add(waypoint);
+		}
+		
 		public function add(waypoint:Waypoint):void
 		{
 			waypoints.push(waypoint);
 			waypoint.wm = this;
 			waypoint.id = id;
 			id++;
+		}
+		
+		public function addAtlanticPoints():void
+		{
+			var x:int = 2000;
+			var y:int = 870;
+			var width:int = 900;
+			var height:int = 1830;
+			var attempts:int = 0;
+			var points:Vector.<Waypoint> = new Vector.<Waypoint>();
+			var wx:int;
+			var wy:int;
+			var tooclose:Boolean = false;
+			var w:Waypoint;
+			while (attempts < 10000)
+			{
+				wx = GV.random() * width * -1 + x;
+				wy = GV.random() * height * -1 + y;
+				for each(w in points)
+				{
+					if (GV.dist(wx, wy, w.x, w.y) < 100)
+					{
+						attempts++;
+						tooclose = true;
+						break;
+					}
+				}
+				if (!tooclose)
+				{
+					points.push(new Waypoint(wx, wy));
+					attempts = 0;
+				}
+				tooclose = false;
+			}
+			for each(w in points)
+			{
+				add(w);
+			}
+			trace(points.length);
 		}
 		
 		public function connectWaypoints():void
@@ -105,7 +151,6 @@ package net.natpat
 			removeConnection(199, 150);
 			removeConnection(154, 199);
 			removeConnection(199, 164);
-			removeConnection(199, 151);
 			removeConnection(222, 218);
 			removeConnection(219, 218);
 			removeConnection(221, 219);
@@ -127,6 +172,7 @@ package net.natpat
 			removeConnection(31, 223);
 			removeConnection(181, 223);
 			removeConnection(30, 223);
+			removeConnection(72, 70);
 		}
 		
 		public function removeConnection(w1:int, w2:int):void

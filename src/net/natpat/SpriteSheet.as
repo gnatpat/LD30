@@ -31,7 +31,7 @@ package net.natpat
 		
 		protected var bitmapData:BitmapData;
 		
-		protected var masterScale:Number;
+		public var masterScale:Number;
 		
 		public function SpriteSheet(source:*, width:int, height:int, scale:Number = 1)
 		{

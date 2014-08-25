@@ -43,6 +43,9 @@ package net.natpat.gui
 		public static var overs:Array = [Bitmap(new Assets.BUTTONS1).bitmapData,
 										 Bitmap(new Assets.BUTTONS2).bitmapData,
 										 Bitmap(new Assets.BUTTONS3).bitmapData]
+										 
+		public var size:int;
+		
 		public function PortSlotGui(parent:PortGui, x:int, y:int, width:int, height:int, port:Port, index:int) 
 		{
 			this.parent = parent;
@@ -62,7 +65,7 @@ package net.natpat.gui
 			
 			if (hasRoute)
 			{
-				var size:int = 29;
+				size = 29;
 				do {
 					dest = new Text(x, y + 61 + index * 80, port.ships[index].route.to.name, size, false, 0);
 					size--;
@@ -70,9 +73,8 @@ package net.natpat.gui
 				
 				dest.x = x + 90 + (135 - dest.width) / 2;
 				dest.y -= (size - 28) * 0.75;
+				rerouteButton = new Button(new BitmapData(95, 25, true), x + 110, y + 100 + index * 80, 95, 25, reroute, 0);
 			}
-			
-			rerouteButton = new Button(new BitmapData(width - 20, height - 20, true, 0xffff0000), 10, height - 10, width - 20, 20, reroute, 0, -1, -1, -1, -1, "Reroute", 16);
 			
 			this.port = port;
 			this.index = index;
@@ -81,15 +83,13 @@ package net.natpat.gui
 		
 		public function render():void 
 		{
+			GV.screen.copyPixels(image, image.rect, new Point(x, y));
 			if (!hasRoute)
 			{
-				GV.screen.copyPixels(image, image.rect, new Point(x, y));
-				buyButton.render();
 				cost.render();
 			}
 			else
 			{
-				GV.screen.copyPixels(image, image.rect, new Point(x, y));
 				dest.render();
 			}
 		}
@@ -98,12 +98,31 @@ package net.natpat.gui
 		{
 			if (!hasRoute)
 			{
+				
 				buyButton.update();
 				cost.update();
 			}
 			else
 			{
 				dest.update();
+				rerouteButton.update();
+			}
+		}
+		
+		public function setPos(x:int, y:int):void
+		{
+			this.x = x;
+			this.y = y;
+			buyButton.x = x + 90
+			buyButton.y = y + 60 + index * 80
+			cost.x = x + 125
+			cost.y = y + 63 + index * 80
+			if (hasRoute)
+			{
+				dest.x = x + 90 + (135 - dest.width) / 2;
+				dest.y = y - (size - 28) * 0.75 + 61 + index * 80;
+				rerouteButton.x = x + 110;
+				rerouteButton.y = y + 100 + index * 80;
 			}
 		}
 		
@@ -130,7 +149,9 @@ package net.natpat.gui
 		
 		public function reroute():void
 		{
-			
+			GV.routeForReplace = true;
+			port.startRoute(index);
+			parent.close();
 		}
 	}
 

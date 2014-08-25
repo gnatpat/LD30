@@ -28,6 +28,7 @@ package net.natpat
 			GV.stage.addEventListener(KeyboardEvent.KEY_UP,   keyReleasedEvent);
 			GV.stage.addEventListener(MouseEvent.MOUSE_DOWN,  mousePressedEvent);
 			GV.stage.addEventListener(MouseEvent.MOUSE_UP,    mouseReleasedEvent);
+			GV.stage.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelEvent);
 		}
 		
 		private static function keyPressedEvent(e:KeyboardEvent):void
@@ -94,6 +95,18 @@ package net.natpat
 		{
 			mouseReleased = true;
 			mouseDown = false;
+		}
+		
+		public static function mouseWheelEvent(e:MouseEvent):void
+		{
+			if (e.delta < 0)
+			{
+				GV.zoomOut();
+			}
+			else if (e.delta > 0)
+			{
+				GV.zoomIn();
+			}
 		}
 		
 		public static function get mouseX():int
