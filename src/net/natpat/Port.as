@@ -111,12 +111,18 @@ package net.natpat
 			pirateSS.changeAnim("default");
 			
 			levelSS = new SpriteSheet(Assets.LEVELS, 50, 100, 0.6);
-			levelSS.addAnim("5", [[0, 0, 0.1]], true);
-			levelSS.addAnim("4", [[1, 0, 0.1]], true);
-			levelSS.addAnim("3", [[2, 0, 0.1]], true);
-			levelSS.addAnim("2", [[3, 0, 0.1]], true);
-			levelSS.addAnim("1", [[4, 0, 0.1]], true);
-			levelSS.addAnim("0", [[5, 0, 0.1]], true);
+			levelSS.addAnim("11", [[0, 0, 0.1]], true);
+			levelSS.addAnim("10", [[1, 0, 0.1]], true);
+			levelSS.addAnim("9", [[2, 0, 0.1]], true);
+			levelSS.addAnim("8", [[3, 0, 0.1]], true);
+			levelSS.addAnim("7", [[4, 0, 0.1]], true);
+			levelSS.addAnim("6", [[5, 0, 0.1]], true);
+			levelSS.addAnim("5", [[6, 0, 0.1]], true);
+			levelSS.addAnim("4", [[7, 0, 0.1]], true);
+			levelSS.addAnim("3", [[8, 0, 0.1]], true);
+			levelSS.addAnim("2", [[9, 0, 0.1]], true);
+			levelSS.addAnim("1", [[10, 0, 0.1]], true);
+			levelSS.addAnim("0", [[11, 0, 0.1]], true);
 			time = 0;
 			
 			setRichness();
@@ -137,7 +143,7 @@ package net.natpat
 			{
 				if (!beenTo)
 				{
-					GuiManager.add(new DialogOk(nuthin, "You can't make a trade route from\n" + name + " yet! Send an explorer\nto this port first."));
+					GuiManager.add(new DialogOk(nuthin, "You can't make a trade route from\n" + name + " yet! Send an explorer\nfrom Bristol to this port first."));
 				}
 				else if (guiPort != this) 
 				{
@@ -160,7 +166,7 @@ package net.natpat
 			super.update();
 			level += GV.elapsed / GC.FULL_LEVEL_INCREASE;
 			level = Math.min(1, level);
-			levelSS.changeAnim("" + int(level / 0.2));
+			levelSS.changeAnim("" + int(level * 11));
 			if (gui != null && guiPort != this)
 			{
 				GuiManager.remove(gui);
@@ -180,7 +186,7 @@ package net.natpat
 			if (hasPirate )
 			{
 				pirateSS.update();
-				GV.gold -= GV.elapsed * richness * GC.GOLD_LOSS_AT_RICHEST_PORT_PER_SECOND;
+				GV.gold -= GV.elapsed * richness * GC.GOLD_LOSS_AT_RICHEST_PORT_PER_SECOND * (GV.years + 1) / 2;
 			}
 			time += GV.elapsed;
 			if (time > 52 * GC.SECONDS_IN_WEEK)

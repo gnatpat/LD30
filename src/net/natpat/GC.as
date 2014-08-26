@@ -22,17 +22,17 @@ package net.natpat
 		
 		public static const MAX_ZOOM:Number = 5.5;
 		
-		public static const DIST_TO_COST_RATIO:int = 50;
+		public static var distToCostRatio:int = 50;
 		
 		public static const SCROLL_BORDER:int = 60;
 		
-		public static const PIRATE_CHANCE:Number = 1 / 600000;
+		public static const PIRATE_CHANCE:Number = 1 / 24000;
 		
 		public static const MAX_RED_SHIPS:int = 3;
 		
 		public static const FULL_LEVEL_INCREASE:Number = 52 * GC.SECONDS_IN_WEEK * 3;
 		
-		public static const SECONDS_IN_WEEK:int = 1;
+		public static const SECONDS_IN_WEEK:int = 2;
 		
 		public static const GOLD_LOSS_AT_RICHEST_PORT_PER_SECOND:Number = 4;
 	}

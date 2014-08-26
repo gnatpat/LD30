@@ -31,7 +31,7 @@ package net.natpat
 			this.w = w;
 			ss = new SpriteSheet(Assets.RED_SHIP, 354, 316, 0.01);
 			addAnims();
-			ss.addAnim("wobble", [[0, 2, wobbleTime], [1, 2, wobbleTime], [2, 2, wobbleTime], [3, 2, wobbleTime], [4, 2, wobbleTime], [5, 2, wobbleTime], [6, 2, wobbleTime], [7, 2, wobbleTime], [8, 2, wobbleTime]], true);
+			//ss.addAnim("wobble", [[0, 2, wobbleTime], [1, 2, wobbleTime], [2, 2, wobbleTime], [3, 2, wobbleTime], [4, 2, wobbleTime], [5, 2, wobbleTime], [6, 2, wobbleTime], [7, 2, wobbleTime], [8, 2, wobbleTime]], true);
 			ss.addAnim("explode", [[0, 0, 0.1], [1, 0, 0.1], [2, 0, 0.1, doneExplode], [3, 0, 0.1], [4, 0, 0.1], [5, 0, 0.1], [6, 0, 5]], true);
 			ss.changeAnim("wobble");
 			pirateSS = new SpriteSheet(Assets.PIRATES, 128, 144, 0.5);
@@ -60,12 +60,12 @@ package net.natpat
 			{
 				next = 1;
 				w.redShip = this;
-				var oldx:int = w.x + circle[circleint][0];
-				var oldy:int = w.y + circle[circleint][1];
+				var oldx:int = w.x
+				var oldy:int = w.y
 				circleint++;
 				circleint = circleint % 4;
-				xDest = w.x + circle[circleint][0]
-				yDest = w.y + circle[circleint][1]
+				xDest = w.x
+				yDest = w.y
 				getDirDir(oldx, oldy);
 				
 			}
@@ -128,6 +128,7 @@ package net.natpat
 		{
 			super.remove();
 			GV.redShipNo--;
+			GV.noOfPirates--;
 		}
 		
 		override public function render(lineBuffer:BitmapData, buffer:BitmapData):void 

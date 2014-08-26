@@ -110,18 +110,20 @@ package net.natpat
 				mouseOver = null;
 			}
 			
-			var chance:Number =  Math.random();
+			var chance:Number =  Math.random()*((GV.noOfPirates + 1) / 2) * 2/ (GV.years / 2);
 			if (this is Port)
 			{
 				if (homePort != this && Port(this).beenTo && chance / 2 < GC.PIRATE_CHANCE)
 				{
 					hasPirate = true;
+					GV.noOfPirates++;
 				}
 			}
-			else if (GV.dist(x, y, homePort.x, homePort.y) < GC.MAX_CONNECTION_LENGTH && chance < GC.PIRATE_CHANCE)
+			else if (GV.dist(x, y, homePort.x, homePort.y) < GV.maxDistance && chance < GC.PIRATE_CHANCE)
 			{
-				this.hasPirate = true;
+				hasPirate = true;
 				trace("Pirate at " + x + ", " + y);
+				GV.noOfPirates++;
 			}
 			
 			if (selected == this)

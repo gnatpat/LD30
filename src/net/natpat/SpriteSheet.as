@@ -120,7 +120,7 @@ package net.natpat
 		}
 		
 		
-		public function render(buffer:BitmapData, x:int, y:int, zoom:Boolean = true, zoomRatio:Number = GC.SPRITE_ZOOM_RATIO, centre:Boolean = true ):void
+		public function render(buffer:BitmapData, x:int, y:int, zoom:Boolean = true, zoomRatio:Number = GC.SPRITE_ZOOM_RATIO, centre:Boolean = true, otherWay:Boolean = false ):void
 		{
 			if (anim == null) return;
 			
@@ -177,8 +177,8 @@ package net.natpat
 				}
 				
 				m.translate( -r.x - r.width / 2, -r.y - r.height / 2);
-				m.scale(scale, scale);
-				m.translate(r.width / 2 * scale, r.height / 2 * scale);
+				m.scale(scale * (otherWay ? -1 : 1), scale);
+				m.translate(r.width / 2 * scale * (otherWay ? -1 : 1), r.height / 2 * scale);
 				
 				m.translate(point.x, point.y);
 				

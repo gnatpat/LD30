@@ -26,7 +26,6 @@ package net.natpat
 			this.lineGraphic = graphic;
 			this.distance = distance;
 			
-			
 			if (connections[0].from is Port)
 				from = Port(connections[0].from);
 			else from = null
@@ -40,7 +39,7 @@ package net.natpat
 				to = null;
 			}
 			if (to != null && from != null)
-				_gold = 5 + 0.01 * GV.dist(to.x, to.y, from.x, from.y);
+				_gold = 5 + GV.goldMult * GV.dist(to.x, to.y, from.x, from.y);
 			
 		}
 		

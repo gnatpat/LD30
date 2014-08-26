@@ -6,6 +6,8 @@ package net.natpat
 	import flash.display.BitmapData;
 	import flash.display.Bitmap;
 	import net.natpat.gui.Button;
+	import net.natpat.gui.Dialog;
+	import net.natpat.gui.DialogOk;
 	import net.natpat.gui.GoldMinus;
 	import net.natpat.gui.GoldPlus;
 	import net.natpat.gui.GuiManager;
@@ -21,6 +23,12 @@ package net.natpat
 	{
 		
 		public static var maxDistance:int = 400;
+		
+		public static var normalDistanceGoldMult:Number = 1;
+				
+		public static var redDistanceGoldMult:Number = 1;
+	
+		public static var goldDistanceGoldMult:Number = 2;
 		
 		public static var onGUI:IGuiElement = null;
 		
@@ -43,7 +51,12 @@ package net.natpat
 		public static var goldShip:Boolean = false;
 		
 		
+		public static var years:int;
+		public static var week:int;
+		
 		public static var redShipNo:int = 0;
+		
+		public static var noOfPirates:int = 0;
 		
 		public static function get redShipAdded():Boolean
 		{
@@ -62,22 +75,31 @@ package net.natpat
 			GV.zoom = Math.min(5, GV.zoom);
 		}
 		
-		public static var _gold:Number = 40;
+		public static var gold:Number = 40;
 		
-		public static function get gold():int
+		public static function get distanceGoldMult():Number
 		{
-			return int(_gold);
+			return GV.goldShip ? goldDistanceGoldMult : (GV.redShip != null ? redDistanceGoldMult : normalDistanceGoldMult);
 		}
 		
-		public static function set gold(gold:int):void
+		public static var wm:WaypointManager
+		
+		public static function checkForWin():void
 		{
-			_gold = _gold;
+			for each(var w:Waypoint in wm.waypoints)
+			{
+				if (w is Port)
+					if (!Port(w).beenTo) return;
+					
+			}
+			GuiManager.add(new DialogOk(null, "Well done! You have connected\nthe world in " + (years - 1) + " years and " + week + " weeks!"));
 		}
+		
 		
 		public static var shipCost:int = 50;
 		public static var redShipCost:int = 20;
 		public static var goldShipCost:int = 20;
-		
+		public static var goldMult :Number = 0.02;
 		public static var shipCosts:Array = [10, 50, 150];
 		
 		public static var w:Waypoint;
@@ -86,7 +108,7 @@ package net.natpat
 		
 		public static function get routeCost():int
 		{
-			return GV.redShipAdded  ? 0 : int(routeDistance / GC.DIST_TO_COST_RATIO) + (routeForReplace ? 0 : (GV.redShip != null? redShipCost : (GV.goldShip ? goldShipCost : shipCost)));
+			return GV.redShipAdded  ? 0 : int(routeDistance / GC.distToCostRatio) * distanceGoldMult + (routeForReplace ? 0 : (GV.redShip != null? redShipCost : (GV.goldShip ? goldShipCost : shipCost)));
 		}
 		
 		public static function get mouseX():int

@@ -44,7 +44,9 @@ package net.natpat
 		[Embed(source = "../../../assets/music/Flute Theme 1.mp3")] public static const MUSIC1:Class;
 		[Embed(source = "../../../assets/music/Guitar Theme 1.mp3")]public static const MUSIC2:Class;
 		[Embed(source = "../../../assets/music/Piano Theme 1.mp3")]public static const MUSIC3:Class;
-		[Embed(source = "../../../assets/music/String Theme 1.mp3")]public static const MUSIC4:Class;
+		[Embed(source = "../../../assets/music/String Theme 1.mp3")]public static const MUSIC4:Class
+		
+		[Embed(source="../../../assets/music/Title Screen Music.mp3")]public static const TITLEMUSIC:Class;
 		
 		[Embed(source = "../../../assets/sfx/Alert Sound (Drum).mp3")] public static const SFX_ALERT:Class; 
 		[Embed(source = "../../../assets/sfx/Boat explosion w-parrot.mp3")]public static const SFX_EXPLODE_PARROT:Class; 
@@ -59,7 +61,9 @@ package net.natpat
 		[Embed(source = "../../../assets/sfx/Slow Wood Creak (SFX).mp3")]public static const SFX_CREAK:Class;
 		[Embed(source = "../../../assets/sfx/Wild Wind (SFX).mp3")]public static const SFX_WIND:Class;
 		[Embed(source = "../../../assets/sfx/Yarr! 1 (SFX).mp3")]public static const SFX_YARR1:Class;
-		[Embed(source="../../../assets/sfx/Yarr! 2 (SFX).mp3")]public static const SFX_YARR2:Class;
+		[Embed(source = "../../../assets/sfx/Yarr! 2 (SFX).mp3")]public static const SFX_YARR2:Class;
+		
+		[Embed(source = "../../../assets/Title.png")] public static const TITLE:Class;
 		
 	}
 

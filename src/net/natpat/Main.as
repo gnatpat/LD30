@@ -1,8 +1,13 @@
 
 package net.natpat
 {
+	import flash.display.Bitmap;
 	import flash.display.Sprite;
 	import flash.events.Event;
+	import flash.geom.Rectangle;
+	import net.natpat.gui.Text;
+	import net.natpat.utils.MouseWheelTrap;
+	import net.natpat.utils.Sfx;
 	
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
@@ -28,6 +33,10 @@ package net.natpat
 		private var prevTime:int;
 		
 		private var currentTime:int;
+		
+		public var clicked:Boolean;
+		
+		public var sfx:Sfx;
 		
 		public function Main():void 
 		{
@@ -55,6 +64,19 @@ package net.natpat
 			stage.quality = StageQuality.HIGH;
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.displayState = StageDisplayState.NORMAL;
+			
+			clicked = false;
+			
+			game.bitmap.bitmapData.copyPixels(Bitmap(new Assets.TITLE).bitmapData, new Rectangle(0, 0, 800, 600), GC.ZERO);
+			
+			var credits:Text = new Text(0, 520, "Code: Nathan Patel\nCode: Ben Juden-Wills\nArt: Felix Marrington-Reeve\nSound/Music: Tom Odell\nSound/Music: Archie Evans\nMotivation: Keyboard Cat\nVisit http://natpat.net for more!", 9, false, 0x68c8ff);
+			
+			credits.renderOnBuffer(game.bitmap.bitmapData);
+			
+			sfx = new Sfx(Assets.TITLEMUSIC, true, null, 1);
+			sfx.play();
+			
+			//MouseWheelTrap.setup(stage);
 		}
 		
 		private function run(e:Event):void
@@ -64,8 +86,23 @@ package net.natpat
 			GV._elapsed = (currentTime - prevTime) / 1000;
 			prevTime = currentTime;
 			
-			game.update();
-			game.render();
+			
+			if (clicked)
+			{
+				game.update();
+				game.render();
+			}
+			else
+			{
+				if (Input.mouseReleased)
+				{
+					Input.mouseReleased = false;
+					Input.mouseDown = false;
+					clicked = true;
+					sfx.stop();
+					game.start();
+				}
+			}
 			
 		}
 		

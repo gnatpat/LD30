@@ -139,7 +139,7 @@ package net.natpat.gui
 			}
 			else
 			{
-				GuiManager.add(new DialogOk(null, "You can't have more than\n" + GC.MAX_RED_SHIPS + " privateers!", 18));
+				GuiManager.add(new DialogOk(null, "You can't have more than\n" + GC.MAX_RED_SHIPS + " privateers! Click and drag privateers to\nmove them.", 18));
 			}
 			this.close();
 		}

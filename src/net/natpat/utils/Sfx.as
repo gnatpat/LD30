@@ -56,7 +56,7 @@ package net.natpat.utils
 			sfxs["seagull"] = new Sfx(Assets.SFX_SEAGULL);
 			sfxs["sink"] = new Sfx(Assets.SFX_SINK, false, null, 1);
 			sfxs["creak"] = new Sfx(Assets.SFX_CREAK);
-			sfxs["wind"] = new Sfx(Assets.SFX_WIND);
+			sfxs["wind"] = new Sfx(Assets.SFX_WIND, false, null, 0.4);
 			sfxs["yarr1"] = new Sfx(Assets.SFX_YARR1);
 			sfxs["yarr2"] = new Sfx(Assets.SFX_YARR2);
 		}

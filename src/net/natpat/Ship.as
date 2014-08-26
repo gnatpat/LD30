@@ -23,7 +23,7 @@ package net.natpat
 		public var xDest:int;
 		public var yDest:int;
 		
-		public var speed:Number = 60;
+		public static var speed:Number = 60;
 		
 		public var dir:Point;
 		public var waypoint:int;
@@ -86,8 +86,8 @@ package net.natpat
 		
 		public function addAnims():void
 		{
-			ss.addAnim("wobble", [[0, 2, wobbleTime], [1, 2, wobbleTime], [2, 2, wobbleTime], [3, 2, wobbleTime], [4, 2, wobbleTime], [5, 2, wobbleTime], [6, 2, wobbleTime], [7, 2, wobbleTime], [8, 2, wobbleTime], [9, 2, wobbleTime], [10, 2, wobbleTime]], true);
-			ss.addAnim("death", [[0, 0, 0.1], [1, 0, 0.1], [2, 0, 0.1], [3, 0, 0.1], [4, 0, 0.1], [5, 0, 0.1], [6, 0, 0.1], [7, 0, 0.1], [8, 0, 0.1], [9, 0, 0.1], [10, 0, 0.1], [11, 0, 0.3, remove]], true);
+			ss.addAnim("wobble", [[1, 2, wobbleTime], [2, 2, wobbleTime], [3, 2, wobbleTime], [4, 2, wobbleTime], [5, 2, wobbleTime], [6, 2, wobbleTime], [7, 2, wobbleTime], [8, 2, wobbleTime], [9, 2, wobbleTime], [10, 2, wobbleTime]], true);
+			ss.addAnim("death", [[0, 0, 0.1], [1, 0, 0.1], [2, 0, 0.1], [3, 0, 0.1], [4, 0, 0.1], [5, 0, 0.1], [6, 0, 0.1], [7, 0, 0.1], [8, 0, 0.1], [9, 0, 0.1], [10, 0, 0.1, remove]], true);
 			ss.changeAnim("wobble");
 		}
 		
@@ -194,6 +194,7 @@ package net.natpat
 			ss.changeAnim("death");
 			move = false;
 			Sfx.sfxs["sink"].play();
+			Sfx.sfxs["yarr1"].play();
 		}
 		
 		public function getDir():void
@@ -248,7 +249,7 @@ package net.natpat
 			var m:Matrix = new Matrix();
 			m.translate( -GV.camera.x + (GC.SCREEN_WIDTH * GV.zoom / 2), - GV.camera.y + (GC.SCREEN_HEIGHT * GV.zoom / 2));
 			lineBuffer.draw(route.lineGraphic, m);
-			ss.render(buffer, x, y, true, GC.SPRITE_ZOOM_RATIO * 1.5);
+			ss.render(buffer, x, y, true, GC.SPRITE_ZOOM_RATIO * 1.5, true, dir.x < 0 ? true : false);
 		}
 		
 	}

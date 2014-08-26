@@ -24,6 +24,7 @@ package net.natpat {
 			if ((waypoint == route.connections.length - 1 && next == 1))
 			{
 				route.to.hasRoute();
+				GV.checkForWin();
 				Sfx.sfxs["discover"].play();
 				this.remove();
 				return;

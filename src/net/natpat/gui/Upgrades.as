@@ -7,6 +7,7 @@ package net.natpat.gui
 	import net.natpat.GC;
 	import net.natpat.GV;
 	import net.natpat.Input;
+	import net.natpat.Ship;
 	import net.natpat.utils.Ease;
 	/**
 	 * ...
@@ -34,10 +35,14 @@ package net.natpat.gui
 		public var cost3Text:Text;
 		public var cost4Text:Text;
 		
-		public var cost1:int = 100;
-		public var cost2:int = 100;
-		public var cost3:int = 100;
-		public var cost4:int = 100;
+		public var cost1:int = 200;
+		public var cost2:int = 200;
+		public var cost3:int = 200;
+		public var cost4:int = 200;
+		public var level1:int = 0;
+		public var level2:int = 0;
+		public var level3:int = 0;
+		public var level4:int = 0;
 		
 		public var costOffsetX:int = 120;
 		public var costOffsetY:int = 80;
@@ -54,10 +59,10 @@ package net.natpat.gui
 			upgrade3 = new Button(new BitmapData(1, 1, true, 0), 141, 402, 260, 170, buyUpgrade3);
 			upgrade4 = new Button(new BitmapData(1, 1, true, 0), 427, 403, 260, 170, buyUpgrade4);
 			
-			cost1Text = new Text(upgrade1.x + costOffsetX, 0, "100", 30, false, 0);
-			cost2Text = new Text(upgrade2.x + costOffsetX, 0, "100", 30, false, 0);
-			cost3Text = new Text(upgrade3.x + costOffsetX, 0, "100", 30, false, 0);
-			cost4Text = new Text(upgrade4.x + costOffsetX, 0, "100", 30, false, 0);
+			cost1Text = new Text(upgrade1.x + costOffsetX, 0, "" + cost1, 30, false, 0);
+			cost2Text = new Text(upgrade2.x + costOffsetX, 0, "" + cost2, 30, false, 0);
+			cost3Text = new Text(upgrade3.x + costOffsetX, 0, "" + cost3, 30, false, 0);
+			cost4Text = new Text(upgrade4.x + costOffsetX, 0, "" + cost4, 30, false, 0);
 			
 			open = new Button(new BitmapData(1, 1, true, 0), 235, 10, 310, 90, changeState);
 			
@@ -78,7 +83,7 @@ package net.natpat.gui
 		
 		public function update():void 
 		{
-				open.update();
+			open.update();
 			if (up)
 			{
 				time += GV.elapsed;
@@ -127,13 +132,17 @@ package net.natpat.gui
 		
 		public function buyUpgrade1():void
 		{
+			trace("1");
 			if (GV.gold >= cost1)
 			{
 				GV.spendGold(cost1, Input.mouseX, Input.mouseY);
 				
 				//DO UPGRADE 1 HERE
+				GV.maxDistance+= 400;
 				//UPDATE COST 1 HERE
+				cost1 *= 1.5;
 				
+				level1++;
 				cost1Text.text = "" + cost1;
 			}
 		}
@@ -146,8 +155,16 @@ package net.natpat.gui
 				
 				//DO UPGRADE 2 HERE
 				//UPDATE COST 2 HERE
+				Ship.speed += 60;
+				cost2 *= 1.5;
 				
+				level2++
 				cost2Text.text = "" + cost2;
+				if (level2 == 6)
+				{
+					cost2 = int.MAX_VALUE;
+					cost2Text.text = "Full"
+				}
 			}
 			
 		}
@@ -160,8 +177,15 @@ package net.natpat.gui
 				
 				//DO UPGRADE 3 HERE
 				//UPDATE COST 3 HERE
-				
+				GV.goldMult*=2;
+				cost3 *= 1.5;
+				level3++
 				cost3Text.text = "" + cost3;
+				if (level3 == 6)
+				{
+					cost3 = int.MAX_VALUE;
+					cost3Text.text = "Full"
+				}
 			}
 			
 		}
@@ -174,8 +198,15 @@ package net.natpat.gui
 				
 				//DO UPGRADE 4 HERE
 				//UPDATE COST 4 HERE
-				
+				GC.distToCostRatio *= 1.25;
+				cost4 *= 1.5;
+				level4++;
 				cost4Text.text = "" + cost4;
+				if (level4 == 6)
+				{
+					cost4 = int.MAX_VALUE;
+					cost4Text.text = "Full"
+				}
 				
 			}
 			

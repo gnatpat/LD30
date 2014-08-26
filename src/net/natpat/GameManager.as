@@ -93,11 +93,11 @@ package net.natpat {
 		public var oldMouseX:int;
 		public var oldMouseY:int;
 		
-		public var sfxBaseTime:Number = 1;
-		public var sfxTimeAdd:Number = 1;
+		public var sfxBaseTime:Number = 1.5;
+		public var sfxTimeAdd:Number = 3;
 		public var sfxTime:Number = 0;
 		public var sfxTimeToGetTo:Number = 0;
-		public var atmos:Array = ["sail", "sail", "sail", "sail", "seagull", "seagull", "seagull", "seagull", "wind", "wind", "wind", "wind", "yarr1", "yarr2", "creak", "creak", "creak", "creak"];
+		public var atmos:Array = ["sail", "wind", "creak"];
 		
 		public var yearText:Text;
 		public var yearDescText:Text;
@@ -108,6 +108,14 @@ package net.natpat {
 		
 		public var yearAlpha:Number = 0;
 		public var yearTextLength:Number = 3;
+		
+		public var gameOver:Boolean = false;
+		
+		public function start():void
+		{
+			musics[currentMusic].play();
+			
+		}
 		
 		public function GameManager(stageWidth:int, stageHeight:int) 
 		{
@@ -128,6 +136,8 @@ package net.natpat {
 			GV.screen = renderer;
 			
 			wm = new WaypointManager(objBD);
+			
+			GV.wm = wm;
 			
 			{
 				wm.addOldPos(new Waypoint(7490, 2090));
@@ -448,7 +458,7 @@ package net.natpat {
 			GuiManager.add(gold);
 			gold.y = GC.SCREEN_HEIGHT - gold.height;
 			
-			timeText = new Text(10, GC.SCREEN_HEIGHT - 50, "Week 1, Year 1", 25, false, 0);
+			timeText = new Text(10, GC.SCREEN_HEIGHT - 50, "Week 1, Year 1", 22, false, 0);
 			GuiManager.add(timeText);
 			timeText.y = GC.SCREEN_HEIGHT - timeText.height;
 			
@@ -479,16 +489,14 @@ package net.natpat {
 			musics[2] = new Sfx(Assets.MUSIC3, false, playSoundtrack, 1);
 			musics[3] = new Sfx(Assets.MUSIC4, false, playSoundtrack, 1);
 			
-			musics[currentMusic].play();
 			
 			Sfx.addSfxs();
 			
-			time = 45;
+			time = 0;
 			
 			yearTextBuffer = new BitmapData(GC.SCREEN_WIDTH, GC.SCREEN_HEIGHT, true, 0);
-			yearText = new Text( -1, -1, "Start of Year 2", 40, false, 0);
-			yearDescText = new Text( -1, GC.SCREEN_HEIGHT / 2, "Wealth of ports changed!", 20, false, 0);
-			yearDescText.y = GC.SCREEN_HEIGHT / 2 + yearText.width / 2;
+			yearText = new Text( -1, -1, "Start of Year 2", 70, false, 0);
+			yearDescText = new Text( -1, GC.SCREEN_HEIGHT / 2 + 50, "Wealth of ports changed!", 30, false, 0);
 		}
 		
 		public function helpUp():void
@@ -543,11 +551,13 @@ package net.natpat {
 			
 			renderer.copyPixels(UIImage, UIImage.rect, new Point(0, GC.SCREEN_HEIGHT - UIImage.height));
 			
-			renderer.copyPixels(clickAndDrag, clickAndDrag.rect, new Point(cadx, cady));
+			if (year <= 2)
+			{
+				renderer.copyPixels(clickAndDrag, clickAndDrag.rect, new Point(cadx, cady));
+			}
 			
 			GuiManager.render();
 			
-			trace(yearAlpha);
 			if (yearAlpha > 0)
 			{
 				if (yearAlpha < 1.5)
@@ -599,7 +609,7 @@ package net.natpat {
 					mouseLine.graphics.lineTo(GV.mouseX, GV.mouseY);
 					var length:int = Math.sqrt((Waypoint.selected.x - GV.mouseX) * (Waypoint.selected.x - GV.mouseX)
 					                         + (Waypoint.selected.y - GV.mouseY) * (Waypoint.selected.y - GV.mouseY));
-					var cost:int = GV.routeCost + length  / GC.DIST_TO_COST_RATIO * ((GV.redShip == null) ? 1 : 0);
+					var cost:int = GV.routeCost + length  * GV.distanceGoldMult / GC.distToCostRatio * ((GV.redShip == null) ? 1 : 0);
 					if (cost > GV.gold)
 					{
 						costText.colour = 0xff0000;
@@ -626,6 +636,10 @@ package net.natpat {
 				}
 				if (Input.mouseReleased)
 				{
+					costText.x = -100;
+					costText.y = -100;
+					distanceText.x = -100;
+					distanceText.y = -100;
 					//if (routeStarted)
 					{
 						if (GV.redShip == null)
@@ -654,13 +668,18 @@ package net.natpat {
 					
 					dialogUp = true;
 					
+					costText.x = -100;
+					costText.y = -100;
+					distanceText.x = -100;
+					distanceText.y = -100;
+					
 					if (GV.routeCost <= GV.gold && GV.routeDistance <= GV.maxDistance)
 					{
 						if (GV.routeForReplace)
 						{
 							GuiManager.add(new Dialog(addReplaceShip, clearRoute, "Are you sure you want to change the ship's\ndestination from " +
  																				  GV.routePort.ships[GV.routeIndex].route.to.name + " to " + Port(GV.currentRoute[oldLength].to).name 
-																				  + " when it next returns?\n" +
+																				  + "\nwhen it next returns?\n" +
 																				  "It will cost " + GV.routeCost + " gold.", 16));
 						}
 						else if (GV.goldShip)
@@ -670,13 +689,15 @@ package net.natpat {
 						}
 						else if (GV.redShip != null)
 						{
+							trace(GV.redShipAdded);
 							if (GV.redShipAdded)
 							{
-								addRedShip();
 								if (Waypoint.selected is Port && !Waypoint.selected.hasPirate)
 								{
-									GuiManager.add(new DialogOk(null, "Privateers can't go\ninto ports unless there are pirates invading!!", 18));
+									GuiManager.add(new DialogOk(null, "Privateers can't go into ports unless\nthere are pirates invading!!", 18));
+									GV.currentRoute.pop();
 								}
+								addRedShip();
 							}
 							else
 							{
@@ -697,7 +718,7 @@ package net.natpat {
 					else
 					{
 						var tooFar:Boolean = GV.routeDistance > GV.maxDistance;
-						var error:String = (tooFar? "It's too far away!" : "You don't have the gold!")
+						var error:String = (tooFar? "It's too far away! Buy an upgrade\nfrom the shipyard." : "You don't have the gold!")
 						if (GV.goldShip)
 						{
 							GuiManager.add(new DialogOk(clearRoute , "You can't send an explorer to " + Port(GV.currentRoute[oldLength].to).name +
@@ -723,22 +744,22 @@ package net.natpat {
 			
 			sm.update();
 			
-			if (Input.keyDown(Key.LEFT))
+			if (Input.keyDown(Key.LEFT) || (GV.makingRoute && Input.mouseX < GC.SCROLL_BORDER))
 			{
 				GV.camera.x -= GC.CAMERA_SCROLL * GV.zoom * GV.elapsed;
 			}
 			
-			if (Input.keyDown(Key.RIGHT))
+			if (Input.keyDown(Key.RIGHT) || (GV.makingRoute && Input.mouseX > GC.SCREEN_WIDTH - GC.SCROLL_BORDER))
 			{
 				GV.camera.x += GC.CAMERA_SCROLL * GV.zoom * GV.elapsed;
 			}
 			
-			if (Input.keyDown(Key.UP))
+			if (Input.keyDown(Key.UP) || (GV.makingRoute && Input.mouseY < GC.SCROLL_BORDER))
 			{
 				GV.camera.y -= GC.CAMERA_SCROLL * GV.zoom * GV.elapsed;
 			}
 			
-			if (Input.keyDown(Key.DOWN))
+			if (Input.keyDown(Key.DOWN) || (GV.makingRoute && Input.mouseY > GC.SCREEN_HEIGHT - GC.SCROLL_BORDER))
 			{
 				GV.camera.y += GC.CAMERA_SCROLL * GV.zoom * GV.elapsed;
 			}
@@ -765,7 +786,7 @@ package net.natpat {
 			GV.camera.x = Math.max(GC.SCREEN_WIDTH * GV.zoom / 2, Math.min(7000 - GC.SCREEN_WIDTH * GV.zoom / 2, GV.camera.x));
 			GV.camera.y = Math.max(GC.SCREEN_HEIGHT * GV.zoom / 2, Math.min(3130 - GC.SCREEN_HEIGHT * GV.zoom / 2, GV.camera.y));
 			
-			gold.text = "" + GV.gold;
+			gold.text = "" + int(GV.gold);
 			
 			gold.x = GC.SCREEN_WIDTH - gold.width - 10;
 			
@@ -775,6 +796,9 @@ package net.natpat {
 			//trace(GV.mouseX, GV.mouseY);
 			
 			year = int(weeks / 52) + 1;
+			
+			GV.years = year;
+			GV.week = int(weeks % 52) + 1;
 			
 			yearAlpha -= GV.elapsed;
 			yearAlpha = Math.max(0, yearAlpha);
@@ -798,6 +822,16 @@ package net.natpat {
 				Sfx.sfxs[atmos[i]].play();
 				sfxTime = 0;
 				sfxTimeToGetTo = sfxBaseTime + sfxTimeAdd * Math.random();
+			}
+			
+			if (GV.gold < 0)
+			{
+				if (!gameOver)
+				{
+					gameOver = true;
+					GuiManager.add(new DialogOk(null, "Your company is in economic ruins.\nYou lasted " + (GV.years -1) + " years and " + (GV.week) + " weeks."));
+				}
+				GV.gold = Math.max(0, GV.gold);
 			}
 			
 			Input.update();
